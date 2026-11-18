@@ -161,13 +161,13 @@ def config_hash(cfg: dict | None = None) -> str:
 
 @lru_cache
 def git_sha() -> str:
-    """Commit of the code that produced the answer ("+dirty" = uncommitted changes)."""
+    """Commit of the code that produced the answer ("+dirty" = uncommitted changes to tracked files)."""
     if sha := os.environ.get("GIT_SHA") or os.environ.get("GITHUB_SHA"):
         return sha[:12]
     try:
         sha = subprocess.run(["git", "rev-parse", "--short=12", "HEAD"], cwd=PROJECT_ROOT,
                              capture_output=True, text=True, check=True).stdout.strip()
-        dirty = subprocess.run(["git", "status", "--porcelain"], cwd=PROJECT_ROOT,
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=PROJECT_ROOT,
                                capture_output=True, text=True).stdout.strip()
         return sha + ("+dirty" if dirty else "")
     except (subprocess.CalledProcessError, FileNotFoundError):
