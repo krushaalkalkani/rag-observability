@@ -37,7 +37,7 @@ retrieval:
   candidates_per_retriever: 20  # how many chunks BM25 and vector search each return
   rrf_k: 60                     # Reciprocal Rank Fusion constant (60 is the standard value)
   rerank_candidates: 20         # fused chunks sent to the cross-encoder
-  top_k: 5                      # chunks finally given to the LLM
+  top_k: 2                      # chunks finally given to the LLM
 
 reranker:
   model: BAAI/bge-reranker-base
