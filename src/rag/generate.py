@@ -23,6 +23,16 @@ def load_prompt(version: str | None = None) -> dict:
     return prompt
 
 
+def prompt_hash(version: str | None = None) -> str:
+    """Fingerprint of the prompt file's CONTENT. Two runs with the same prompt_version
+    but different hashes mean someone edited a prompt in place without bumping its
+    version - the CI comparison flags that."""
+    import hashlib
+
+    version = version or load_config()["prompt"]["version"]
+    return hashlib.sha256((PROMPTS_DIR / f"{version}.yaml").read_bytes()).hexdigest()[:12]
+
+
 def format_context(chunks: list[dict]) -> str:
     parts = []
     for c in chunks:

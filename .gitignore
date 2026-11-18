@@ -15,3 +15,4 @@ data/chroma_ci/
 logs/
 .claude/
 data/metrics.db
+eval/reports/pr_comment.md

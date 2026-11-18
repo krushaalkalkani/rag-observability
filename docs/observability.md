@@ -207,3 +207,55 @@ the dashboard and Langfuse* to find it.
    how long after the change), root cause (the exact config line + commit), evidence
    (dashboard screenshot and two trace links: bad vs good), fix, and what would have
    caught it sooner (Phase 3's CI gate).
+
+---
+
+# Observability, Phase 3 — regression gating in CI
+
+Monitoring (Phase 2) finds a regression *after* users hit it. The gate stops it
+*before* merge: every pull request runs the golden-set eval and is compared with
+`main`. Incident 001 is why it matters: that change made every online quality metric
+look *better*, but it dropped retrieval hit rate, and the gate measures hit rate
+offline against known answers.
+
+```
+push to main ──► eval ──► artifact "eval-baseline"
+                                  │
+pull request ──► eval ──► eval/compare.py ◄──┘ ──► PR comment (metric, main, PR, Δ, allowed)
+                                  └──► job fails if a metric regressed
+```
+
+## What fails a PR
+
+| Check | Rule | Why this number |
+|---|---|---|
+| hit_rate@5 | may not drop > 2 pts | retrieval is deterministic (0 change between identical runs), so losing a single question fails |
+| faithfulness | may not drop > 3 pts | judge noise between identical runs: 0.3 pts |
+| citation_coverage | may not drop > 3 pts | noise: 1.2 pts |
+| refusal_accuracy | may not drop > 5 pts | one of 39 questions may flip, two may not |
+| p95 latency | may not grow > 50% | identical runs differed by +29% (39 calls to a shared API); only compared when both ran on the same kind of machine |
+| absolute floors | `eval.thresholds` (Project 1) | still apply |
+
+Tolerances live in `configs/config.yaml` → `eval.regression`, calibrated on two runs
+of the same system (2026-11-17 vs 2026-11-18). Comparing to `main` catches what fixed
+floors miss: 0.99 → 0.88 clears a 0.85 floor but is an 11-point regression.
+
+## Versioning: every report knows what it measured
+
+Each eval report records `prompt_version`, `prompt_hash` (the prompt file's content),
+`config_hash`, `git_sha` and `runner`. The PR comment starts with "what this PR
+changes", and it warns when a prompt file was **edited without bumping its version**,
+which would make old and new traces indistinguishable.
+
+## Running it
+
+| Command | What it does |
+|---|---|
+| `make ci-local` | exactly what CI runs on a PR, compared with the committed `eval/baseline/main.json` (~$2) |
+| `make baseline` | after `make ci-local` on main: make that report the committed fallback baseline |
+| `uv run python eval/compare.py A.json B.json` | compare any two eval reports |
+
+On GitHub the baseline comes from the latest successful `main` run's `eval-baseline`
+artifact; the committed file is only the fallback before `main` has run once. The
+committed baseline ran on a laptop, so latency is not gated against it, only against
+a CI baseline.

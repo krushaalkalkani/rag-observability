@@ -9,6 +9,9 @@
 > online faithfulness over time (`make metrics`, `make dashboard`), with calibrated alerts.
 > Incident drill: [docs/incident-001.md](docs/incident-001.md) — a "cost optimization" that
 > silently cut answer evidence, root-caused in under 7 minutes.
+> Phase 3 done: every PR runs the golden-set eval, is compared with `main`, gets a comment
+> table (metric, main, PR, Δ) and fails on regressions: [example](docs/example-pr-comment.md) —
+> a prompt-only "readability" change that dropped citation coverage 96% → 71%.
 
 Ask a question about 10 companies' latest 10-K annual reports and get an answer with
 citations to the exact source passage, or a refusal when the filings don't contain the answer.

@@ -28,6 +28,7 @@ Writes eval/reports/eval_<name>.json and .md
 import argparse
 import asyncio
 import json
+import math
 import statistics
 import sys
 import time
@@ -37,11 +38,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+import os  # noqa: E402
+import platform  # noqa: E402
+
 from rag.config import load_config  # noqa: E402
+from rag.generate import prompt_hash  # noqa: E402
 from rag.guardrails import CITATION_GROUP_RE  # noqa: E402
 from rag.judge import make_judge  # noqa: E402
 from rag.pipeline import answer_question  # noqa: E402
 from rag.retrieve import retrieve  # noqa: E402
+from rag.tracing import config_hash, git_sha  # noqa: E402
 
 GATED = ["faithfulness", "hit_rate@5", "refusal_accuracy", "citation_coverage"]
 
@@ -58,7 +64,10 @@ async def judge_all(rows: list[dict], cfg: dict) -> dict:
     async def score(row, name, coro):
         async with sem:
             try:
-                row[name] = round(float((await coro).value), 3)
+                value = float((await coro).value)
+                if math.isnan(value):  # RAGAS returns NaN when it can't grade: treat it as a failed call
+                    raise ValueError("judge returned NaN")
+                row[name] = round(value, 3)
             except Exception as e:  # a judge failure must not crash the whole eval
                 row[name] = None
                 errors.append(f"{row['id']} {name}: {type(e).__name__}: {str(e)[:150]}")
@@ -99,7 +108,7 @@ def run_pipeline(golden: list[dict], args) -> list[dict]:
 
 
 def mean(xs):
-    xs = [x for x in xs if x is not None]
+    xs = [x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))]
     return round(statistics.mean(xs), 3) if xs else None
 
 
@@ -139,6 +148,7 @@ def to_markdown(rep: dict) -> str:
         f"- Questions: {rep['n_questions']} ({rep['n_answerable']} answerable, {rep['n_questions'] - rep['n_answerable']} must-refuse)"
         + (f", tickers {', '.join(rep['tickers'])}" if rep["tickers"] else ""),
         f"- Prompt `{rep['prompt_version']}` · model `{rep['model']}` · retrieval `{rep['retrieval_mode']}` · guardrails {rep['guardrails']}",
+        f"- Code `{rep.get('git_sha')}` · config `{rep.get('config_hash')}` · prompt file `{rep.get('prompt_hash')}` · runner `{rep.get('runner')}`",
         f"- Judge `{rep['judge']['model']}` (effort {rep['judge']['effort']}): {rep['judge']['calls']} calls, "
         f"{rep['judge']['input_tokens']:,} in / {rep['judge']['output_tokens']:,} out tokens, {len(rep['judge']['errors'])} errors", "",
         "| Metric | Value | Threshold |", "|---|---|---|",
@@ -199,6 +209,10 @@ def main():
         "tickers": args.tickers, "n_questions": len(rows), "n_answerable": sum(not r["should_refuse"] for r in rows),
         "prompt_version": rows[0]["prompt_version"], "model": next((r["model"] for r in rows if r["model"]), None),
         "retrieval_mode": rows[0]["retrieval_mode"], "guardrails": not args.no_guardrails,
+        # Exactly what was evaluated, so any report can be traced to code + config + prompt.
+        "git_sha": git_sha(), "config_hash": config_hash(cfg), "prompt_hash": prompt_hash(rows[0]["prompt_version"]),
+        # Where it ran: latency is only comparable between runs on the same kind of machine.
+        "runner": "github-actions" if os.environ.get("GITHUB_ACTIONS") == "true" else f"local-{platform.system().lower()}",
         "judge": {"model": cfg["eval"]["judge_model"], "effort": cfg["eval"]["judge_effort"], **judge},
         "metrics": metrics, "thresholds": thresholds, "gate_failures": failures, "rows": rows,
     }

@@ -1,18 +1,31 @@
-# Quality gate: every pull request builds an index from a small fixture corpus,
-# runs the evaluation, and FAILS if answer quality drops below the thresholds
-# in configs/config.yaml (eval.thresholds).
+# Regression gate (Project 3, Phase 3).
+#
+# Push to main:  run the golden-set eval and publish the report as the "eval-baseline"
+#                artifact - the reference every pull request is compared against.
+# Pull request:  run the same eval, compare it with main's latest baseline
+#                (eval/compare.py), post the comparison as a PR comment, and FAIL if
+#                quality dropped beyond the tolerances in configs/config.yaml
+#                (eval.regression), p95 latency grew too much, or any metric is below
+#                its absolute threshold (eval.thresholds).
 #
 # Setup once: repo Settings -> Secrets and variables -> Actions -> New secret
-#   ANTHROPIC_API_KEY  (used for the answering model and the RAGAS judge, ~$2 per run)
+#   ANTHROPIC_API_KEY  (answering model + RAGAS judge, ~$2 per run)
 name: eval-gate
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
-concurrency:  # a new push to the same PR cancels the old run (saves time and API cost)
+concurrency:  # a new push to the same branch cancels the old run (saves time and API cost)
   group: eval-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read          # download main's baseline artifact
+  pull-requests: write   # post the summary comment
 
 jobs:
   unit-tests:
@@ -33,6 +46,8 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       RAG_CHROMA_DIR: data/chroma_ci
       HF_HUB_DISABLE_TELEMETRY: "1"
+      # Record the commit the PR author pushed, not GitHub's temporary merge commit.
+      GIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -58,15 +73,62 @@ jobs:
       - name: Build index from fixture corpus (AAPL, TSLA, NVDA)
         run: uv run python -m rag.ingest --from-processed data/fixtures
 
-      - name: Run eval and enforce thresholds
-        run: uv run python eval/run_eval.py --tickers AAPL TSLA NVDA --name ci --gate
+      - name: Run eval on the golden set
+        # On main the absolute thresholds gate the baseline itself; on PRs, compare.py gates.
+        run: uv run python eval/run_eval.py --tickers AAPL TSLA NVDA --name ci ${{ github.event_name == 'push' && '--gate' || '' }}
 
-      - name: Publish report to the job summary
+      # ---------- main: publish the baseline ----------
+      - name: Publish baseline for pull requests
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-baseline
+          path: eval/reports/eval_ci.json
+          retention-days: 90
+
+      # ---------- pull requests: compare with main and explain ----------
+      - name: Get the baseline from main
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p baseline
+          run_id=$(gh run list --workflow eval.yml --branch main --event push --status success \
+                   --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -n "$run_id" ] && gh run download "$run_id" --name eval-baseline --dir baseline; then
+            echo "Baseline: eval-baseline from main run $run_id"
+          else
+            cp eval/baseline/main.json baseline/eval_ci.json
+            echo "::warning::No baseline from a main run yet - comparing with the committed eval/baseline/main.json"
+          fi
+
+      - name: Compare with main
+        id: compare
+        if: github.event_name == 'pull_request'
+        continue-on-error: true   # post the explanation first, fail the job after
+        run: uv run python eval/compare.py baseline/eval_ci.json eval/reports/eval_ci.json --comment comment.md
+
+      - name: Post the comparison on the PR
+        if: github.event_name == 'pull_request' && always() && hashFiles('comment.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Updates the bot's previous comment instead of adding a new one on every push.
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file comment.md --edit-last --create-if-none
+
+      - name: Publish to the job summary
         if: always()
-        run: cat eval/reports/eval_ci.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: cat comment.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || cat eval/reports/eval_ci.md >> "$GITHUB_STEP_SUMMARY" || true
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: eval-report
-          path: eval/reports/eval_ci.*
+          path: |
+            eval/reports/eval_ci.*
+            comment.md
+
+      - name: Fail on regression
+        if: steps.compare.outcome == 'failure'
+        run: |
+          echo "::error::Eval gate failed - see the PR comment / job summary for what regressed and why."
+          exit 1

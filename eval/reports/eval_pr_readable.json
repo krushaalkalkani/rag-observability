@@ -1,0 +1,1231 @@
+{
+  "name": "ci",
+  "timestamp": "2026-11-18 14:22",
+  "duration_s": 691,
+  "tickers": [
+    "AAPL",
+    "TSLA",
+    "NVDA"
+  ],
+  "n_questions": 39,
+  "n_answerable": 28,
+  "prompt_version": "answer_v3_readable",
+  "model": "anthropic:claude-haiku-5-5",
+  "retrieval_mode": "hybrid_rerank",
+  "guardrails": true,
+  "git_sha": "658aae5ae760+dirty",
+  "config_hash": "ff9816c532b1",
+  "prompt_hash": "2e70d48308d6",
+  "runner": "local-darwin",
+  "judge": {
+    "model": "claude-opus-5-5",
+    "effort": "low",
+    "calls": 97,
+    "input_tokens": 324551,
+    "output_tokens": 14014,
+    "errors": [
+      "q006 context_recall: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q004 faithfulness: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q006 faithfulness: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q007 context_recall: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q007 faithfulness: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q008 faithfulness: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q037 faithfulness: InstructorRetryException: Request timed out or interrupted. This could be due to a network timeout, dropped connection, or request cancellation. See https://docs.anthropic.com/",
+      "q005 answer_correctness: ValueError: judge returned NaN",
+      "q006 answer_correctness: ValueError: judge returned NaN"
+    ]
+  },
+  "metrics": {
+    "hit_rate@5": 0.929,
+    "mrr@5": 0.698,
+    "context_recall": 0.962,
+    "faithfulness": 0.944,
+    "answer_correctness": 0.471,
+    "citation_coverage": 0.71,
+    "refusal_accuracy": 0.744,
+    "false_refusal_rate": 0.25,
+    "p50_latency_ms": 1824,
+    "p95_latency_ms": 3030
+  },
+  "thresholds": {
+    "faithfulness": 0.85,
+    "hit_rate@5": 0.8,
+    "refusal_accuracy": 0.85,
+    "citation_coverage": 0.85
+  },
+  "gate_failures": [
+    "refusal_accuracy = 0.744 < threshold 0.85",
+    "citation_coverage = 0.71 < threshold 0.85"
+  ],
+  "rows": [
+    {
+      "id": "q001",
+      "question": "How many people did Apple employ at the end of fiscal 2026?",
+      "reference_answer": "Approximately 167,000 full-time equivalent employees.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00012",
+        "AAPL-2026-00013"
+      ],
+      "answer": "Apple reported approximately 167,000 full-time equivalent employees as of September 26, 2026, the end of fiscal 2026. [AAPL-2026-00013]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00013"
+      ],
+      "retrieved": [
+        "AAPL-2026-00013",
+        "AAPL-2026-00012",
+        "AAPL-2026-00099",
+        "AAPL-2026-00100",
+        "AAPL-2026-00095"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 1.0,
+      "latency_ms": 2927,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q002",
+      "question": "What were Apple's total net sales in fiscal 2026?",
+      "reference_answer": "$478,834 million, up 15% from 2025.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00066",
+        "AAPL-2026-00067",
+        "AAPL-2026-00086",
+        "AAPL-2026-00111",
+        "AAPL-2026-00112"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "AAPL-2026-00111",
+        "AAPL-2026-00066",
+        "AAPL-2026-00110",
+        "AAPL-2026-00112",
+        "AAPL-2026-00067"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.0,
+      "latency_ms": 2039,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q003",
+      "question": "How much is Apple's quarterly dividend per share?",
+      "reference_answer": "$0.27 per share, which Apple intends to increase annually.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00071"
+      ],
+      "answer": "The company raised it from $0.26 beginning in May 2026. [AAPL-2026-00071]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00071"
+      ],
+      "retrieved": [
+        "AAPL-2026-00071",
+        "AAPL-2026-00080",
+        "AAPL-2026-00081",
+        "AAPL-2026-00110",
+        "AAPL-2026-00105"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.5,
+      "latency_ms": 1509,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.25
+    },
+    {
+      "id": "q004",
+      "question": "Where is Apple's head office?",
+      "reference_answer": "Cupertino, California.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00056"
+      ],
+      "answer": "The Properties section of the FY2026 10-K says so directly, and the cover page gives the principal executive office address as One Apple Park Way, Cupertino, California 95014. [AAPL-2026-00056] [AAPL-2026-00000]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00056",
+        "AAPL-2026-00000"
+      ],
+      "retrieved": [
+        "AAPL-2026-00056",
+        "AAPL-2026-00000",
+        "AAPL-2026-00022",
+        "AAPL-2026-00055",
+        "AAPL-2026-00109"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.5,
+      "latency_ms": 1633,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_correctness": 0.75
+    },
+    {
+      "id": "q005",
+      "question": "What share of Apple's revenue is sold through resellers and carriers rather than directly?",
+      "reference_answer": "About 60% of total net sales came through indirect distribution channels.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00007"
+      ],
+      "answer": "The remainder is sold directly through its retail and online stores and direct sales force. [AAPL-2026-00007]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00007"
+      ],
+      "retrieved": [
+        "AAPL-2026-00031",
+        "AAPL-2026-00051",
+        "AAPL-2026-00016",
+        "AAPL-2026-00087",
+        "AAPL-2026-00007"
+      ],
+      "hit_rank": 5,
+      "citation_coverage": 0.5,
+      "latency_ms": 1604,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": null,
+      "context_recall": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q006",
+      "question": "Why is Tesla's reliance on its CEO considered a risk?",
+      "reference_answer": "Tesla is highly dependent on Elon Musk, who does not devote his full time to Tesla and holds roles at SpaceX, xAI, Neuralink and The Boring Company.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00041",
+        "TSLA-2025-00042"
+      ],
+      "answer": "The filing notes that he is active in management but also holds management positions at other companies, including Space Exploration Technologies Corp., X.AI Holdings Corp. (\"xAI\"), Neuralink Corp. and The Boring Company, and is involved in other ventures. [TSLA-2025-00042]\n\n If the stock price fell substantially, he could be forced to sell shares to meet loan obligations, or he might sell shares to fund other ventures or tax obligations tied to the 2018 CEO Performance Award, and such sales could push the stock price down. [TSLA-2025-00061]\n\n Tesla warns that these long-horizon investments may not deliver expected returns and could lead to write-downs or underperformance. [TSLA-2025-00061]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00042",
+        "TSLA-2025-00061"
+      ],
+      "retrieved": [
+        "TSLA-2025-00043",
+        "TSLA-2025-00042",
+        "TSLA-2025-00052",
+        "TSLA-2025-00038",
+        "TSLA-2025-00061"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 0.5,
+      "latency_ms": 3021,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": null
+    },
+    {
+      "id": "q007",
+      "question": "When did Tesla start its autonomous ride-hailing service?",
+      "reference_answer": "Tesla launched its Robotaxi service in June 2025.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00006"
+      ],
+      "answer": "The filings describe it as an autonomous ride-hailing platform, and say the service currently operates with Model Y vehicles. [TSLA-2025-00032] [TSLA-2025-00006] [TSLA-2025-00055]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00032",
+        "TSLA-2025-00006",
+        "TSLA-2025-00055"
+      ],
+      "retrieved": [
+        "TSLA-2025-00032",
+        "TSLA-2025-00055",
+        "TSLA-2025-00006",
+        "TSLA-2025-00021",
+        "TSLA-2025-00019"
+      ],
+      "hit_rank": 3,
+      "citation_coverage": 0.5,
+      "latency_ms": 1740,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 0.0
+    },
+    {
+      "id": "q008",
+      "question": "How much battery storage capacity did Tesla deploy in 2025?",
+      "reference_answer": "46.7 GWh of energy storage products.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00074"
+      ],
+      "answer": "Tesla deployed 46.7 GWh of energy storage products in 2025, according to its FY2025 Management's Discussion and Analysis. [TSLA-2025-00074]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00074"
+      ],
+      "retrieved": [
+        "TSLA-2025-00074",
+        "TSLA-2025-00012",
+        "TSLA-2025-00078",
+        "TSLA-2025-00006",
+        "TSLA-2025-00007"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 1.0,
+      "latency_ms": 1486,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_correctness": 1.0
+    },
+    {
+      "id": "q009",
+      "question": "What is Tesla's Cybercab?",
+      "reference_answer": "Tesla's purpose-built autonomous vehicle for its Robotaxi business.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00006"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00074",
+        "TSLA-2025-00006",
+        "TSLA-2025-00032",
+        "TSLA-2025-00033",
+        "TSLA-2025-00025"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 0.333,
+      "latency_ms": 1877,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q010",
+      "question": "Which chip architecture generated most of NVIDIA's data center sales?",
+      "reference_answer": "Blackwell architectures represented the majority of Data Center revenue.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00091"
+      ],
+      "answer": "According to NVIDIA's FY2026 Management's Discussion and Analysis, the Blackwell architecture was the chip architecture behind most of the company's Data Center revenue: \"Our Blackwell architectures represented the majority of our Data Center revenue.\" [NVDA-2026-00091] The filing also notes that Data Center computing revenue grew 59%, driven by demand for the Blackwell computing platform. [NVDA-2026-00100]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00091",
+        "NVDA-2026-00100"
+      ],
+      "retrieved": [
+        "NVDA-2026-00091",
+        "NVDA-2026-00006",
+        "NVDA-2026-00100",
+        "NVDA-2026-00011",
+        "NVDA-2026-00012"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 1.0,
+      "latency_ms": 1824,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q011",
+      "question": "How large is NVIDIA's workforce and how much of it is in R&D?",
+      "reference_answer": "About 42,000 employees in 38 countries; 31,000 in research and development.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00025"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "NVDA-2026-00026",
+        "AAPL-2026-00011",
+        "NVDA-2026-00009",
+        "TSLA-2025-00023",
+        "TSLA-2025-00008"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.2,
+      "latency_ms": 2487,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 0.0
+    },
+    {
+      "id": "q012",
+      "question": "How is the Chinese government affecting NVIDIA's data center business?",
+      "reference_answer": "China has encouraged customers to buy from China-based competitors and discouraged purchases of NVIDIA products, which may hurt Data Center revenue.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00024",
+        "NVDA-2026-00025",
+        "NVDA-2026-00070"
+      ],
+      "answer": "According to the risk factors, the Chinese government has encouraged customers to buy from China-based competitors and discouraged them from purchasing, importing, or using NVIDIA's data center products, including any China-specific product designed to comply with U.S. export controls. [NVDA-2026-00070] [NVDA-2026-00025]\n\nThe company also notes that increased oversight of digital platform companies in China may adversely affect its Data Center revenue, even if it is able to participate in the China data center compute market. [NVDA-2026-00070] [NVDA-2026-00024]\n\n NVIDIA warns that, if export controls were changed to allow it back into the market, the Chinese government could modify or implement the plan in a way that effectively prevents it from designing products that meet the new standard. [NVDA-2026-00070]\n\n The company says it cannot currently create a product that wins approval from both the U.S. government and the Chinese government. [NVDA-2026-00023]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00070",
+        "NVDA-2026-00025",
+        "NVDA-2026-00024",
+        "NVDA-2026-00023"
+      ],
+      "retrieved": [
+        "NVDA-2026-00025",
+        "NVDA-2026-00070",
+        "NVDA-2026-00048",
+        "NVDA-2026-00024",
+        "NVDA-2026-00023"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.571,
+      "latency_ms": 3030,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.75
+    },
+    {
+      "id": "q028",
+      "question": "How much revenue did the iPhone bring Apple in fiscal 2026?",
+      "reference_answer": "$254,098 million, up 21% from $209,586 million in 2025.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00067",
+        "AAPL-2026-00086"
+      ],
+      "answer": "Apple's iPhone net sales in fiscal 2026 were $254,098 million, up 21% from $209,586 million in 2025. [AAPL-2026-00086] [AAPL-2026-00067]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00086",
+        "AAPL-2026-00067"
+      ],
+      "retrieved": [
+        "AAPL-2026-00087",
+        "AAPL-2026-00086",
+        "AAPL-2026-00066",
+        "AAPL-2026-00098",
+        "AAPL-2026-00067"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 1.0,
+      "latency_ms": 1832,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q029",
+      "question": "How much did Apple spend on research and development in fiscal 2026?",
+      "reference_answer": "$45,765 million, up 32%, equal to 10% of total net sales.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00069"
+      ],
+      "answer": "The Company attributed the increase primarily to higher infrastructure-related costs, including investments in artificial intelligence, and headcount-related expenses. [AAPL-2026-00069] [AAPL-2026-00076]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00069",
+        "AAPL-2026-00076"
+      ],
+      "retrieved": [
+        "AAPL-2026-00110",
+        "AAPL-2026-00069",
+        "AAPL-2026-00111",
+        "AAPL-2026-00098",
+        "AAPL-2026-00076"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 0.5,
+      "latency_ms": 1690,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0
+    },
+    {
+      "id": "q030",
+      "question": "How much of its own stock did Apple buy back in fiscal 2026?",
+      "reference_answer": "$85.8 billion of common stock (and $15.7 billion paid in dividends).",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00071"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "AAPL-2026-00061",
+        "AAPL-2026-00071",
+        "AAPL-2026-00104",
+        "AAPL-2026-00062",
+        "AAPL-2026-00002"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 0.333,
+      "latency_ms": 1618,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q031",
+      "question": "What were Apple's Services net sales in fiscal 2026?",
+      "reference_answer": "$123,301 million, up from $109,158 million in 2025.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00076"
+      ],
+      "answer": "The disaggregated net sales table notes that Services figure includes amortization of the deferred value of services bundled in the sales price of certain products. [AAPL-2026-00086]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00086"
+      ],
+      "retrieved": [
+        "AAPL-2026-00066",
+        "AAPL-2026-00068",
+        "AAPL-2026-00086",
+        "AAPL-2026-00111",
+        "AAPL-2026-00007"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.5,
+      "latency_ms": 1615,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 0.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q032",
+      "question": "Why did Apple's sales in Greater China rise in 2026?",
+      "reference_answer": "Higher net sales of iPhone and Mac, plus a favorable effect from the stronger renminbi.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00066",
+        "AAPL-2026-00067"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "AAPL-2026-00067",
+        "AAPL-2026-00066",
+        "AAPL-2026-00007",
+        "AAPL-2026-00069",
+        "AAPL-2026-00012"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.333,
+      "latency_ms": 1757,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q033",
+      "question": "What was Apple's gross margin percentage on products in 2026?",
+      "reference_answer": "39.3%, up from 36.8% in 2025.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "AAPL-2026-00068"
+      ],
+      "answer": "The filing attributes the 2026 increase primarily to product mix and tariff refunds, partially offset by higher costs, including memory. [AAPL-2026-00068] [AAPL-2026-00067]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "AAPL-2026-00068",
+        "AAPL-2026-00067"
+      ],
+      "retrieved": [
+        "AAPL-2026-00068",
+        "AAPL-2026-00069",
+        "AAPL-2026-00066",
+        "AAPL-2026-00067",
+        "AAPL-2026-00098"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.5,
+      "latency_ms": 1727,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 0.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q034",
+      "question": "What were Tesla's total revenues in 2025 and how did they change from 2024?",
+      "reference_answer": "$94,827 million, down 3% ($2,863 million) from $97,690 million in 2024.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00087",
+        "TSLA-2025-00088",
+        "TSLA-2025-00118",
+        "TSLA-2025-00109"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00074",
+        "TSLA-2025-00120",
+        "TSLA-2025-00088",
+        "TSLA-2025-00195",
+        "TSLA-2025-00092"
+      ],
+      "hit_rank": 3,
+      "citation_coverage": 0.0,
+      "latency_ms": 1633,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q035",
+      "question": "How much revenue did Tesla's energy business generate in 2025?",
+      "reference_answer": "Energy generation and storage segment revenue was $12,771 million, up 27%.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00087",
+        "TSLA-2025-00088",
+        "TSLA-2025-00109"
+      ],
+      "answer": "That works out to an increase of $2.69 billion, or 27%, which the company attributed mainly to higher Megapack and Powerwall deployments, partly offset by a lower average selling price for Megapack. [TSLA-2025-00194] [TSLA-2025-00088] [TSLA-2025-00089]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00194",
+        "TSLA-2025-00088",
+        "TSLA-2025-00089"
+      ],
+      "retrieved": [
+        "TSLA-2025-00194",
+        "TSLA-2025-00195",
+        "TSLA-2025-00088",
+        "TSLA-2025-00089",
+        "TSLA-2025-00074"
+      ],
+      "hit_rank": 3,
+      "citation_coverage": 0.5,
+      "latency_ms": 1851,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "q036",
+      "question": "What is Tesla's Cortex?",
+      "reference_answer": "Tesla's AI training cluster at Gigafactory Texas; Tesla is also building Cortex 2.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00009"
+      ],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00009",
+        "TSLA-2025-00078",
+        "TSLA-2025-00005",
+        "TSLA-2025-00006",
+        "TSLA-2025-00007"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.333,
+      "latency_ms": 2007,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 0.0,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q037",
+      "question": "Which company is Tesla working with to make AI chips in the United States?",
+      "reference_answer": "Samsung, to manufacture advanced semiconductors for AI inference and training in the U.S.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00009"
+      ],
+      "answer": "According to Tesla's FY2025 10-K, the company announced a new collaboration with Samsung to manufacture advanced semiconductors for AI inference and training in the U.S. [TSLA-2025-00009] Tesla's filing also notes that it expanded its Cortex training cluster at Gigafactory Texas and is building Cortex 2 there. [TSLA-2025-00009]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00009"
+      ],
+      "retrieved": [
+        "TSLA-2025-00195",
+        "TSLA-2025-00005",
+        "TSLA-2025-00009",
+        "TSLA-2025-00007",
+        "NVDA-2026-00020"
+      ],
+      "hit_rank": 3,
+      "citation_coverage": 1.0,
+      "latency_ms": 1889,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_correctness": 1.0
+    },
+    {
+      "id": "q038",
+      "question": "What share of Tesla's employees receive stock as part of their pay?",
+      "reference_answer": "92% of employees are included in total rewards packages with stock ownership opportunities.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "TSLA-2025-00022",
+        "TSLA-2025-00023"
+      ],
+      "answer": "Based on the Human Capital Resources section, Tesla says 92% of its employees are included in total rewards packages, which emphasize stock ownership opportunities. [TSLA-2025-00023]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00023"
+      ],
+      "retrieved": [
+        "TSLA-2025-00023",
+        "TSLA-2025-00166",
+        "TSLA-2025-00175",
+        "TSLA-2025-00083",
+        "TSLA-2025-00114"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 1.0,
+      "latency_ms": 1589,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "answer_correctness": 1.0,
+      "faithfulness": 0.667,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q039",
+      "question": "What was NVIDIA's total revenue for fiscal year 2026?",
+      "reference_answer": "$215.9 billion ($215,938 million), up 65% from a year ago.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00094",
+        "NVDA-2026-00126",
+        "NVDA-2026-00175",
+        "NVDA-2026-00177",
+        "NVDA-2026-00099"
+      ],
+      "answer": "NVIDIA's total revenue for fiscal year 2026 (the year ended January 25, 2026) was $215,938 million, or about $215.9 billion, up 65% from the prior year. [NVDA-2026-00094] [NVDA-2026-00126]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00094",
+        "NVDA-2026-00126"
+      ],
+      "retrieved": [
+        "NVDA-2026-00094",
+        "NVDA-2026-00157",
+        "NVDA-2026-00100",
+        "NVDA-2026-00126",
+        "NVDA-2026-00175"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 1.0,
+      "latency_ms": 1606,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q040",
+      "question": "How large was NVIDIA's charge related to the H20 chip and what caused it?",
+      "reference_answer": "A $4.5 billion charge in Q1 fiscal 2026 for excess H20 inventory and purchase obligations, after new U.S. export licensing requirements.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00022",
+        "NVDA-2026-00064",
+        "NVDA-2026-00092"
+      ],
+      "answer": "The company said this charge arose after the U.S. government informed it in April 2025 that a license was required to export H20 integrated circuits to China and certain other countries, and because demand for the H20 products diminished. [NVDA-2026-00064] [NVDA-2026-00092]\n\nThe charge also weighed on the company's results more broadly: it was cited as a factor reducing gross margin, which fell to 71.1% in fiscal 2026 from 75.0% in fiscal 2025, and it partly offset growth in Compute & Networking segment operating income. [NVDA-2026-00100] [NVDA-2026-00102]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00064",
+        "NVDA-2026-00092",
+        "NVDA-2026-00100",
+        "NVDA-2026-00102"
+      ],
+      "retrieved": [
+        "NVDA-2026-00064",
+        "NVDA-2026-00100",
+        "NVDA-2026-00102",
+        "NVDA-2026-00092",
+        "NVDA-2026-00095"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.667,
+      "latency_ms": 2109,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.5
+    },
+    {
+      "id": "q041",
+      "question": "How much did NVIDIA spend repurchasing its shares in fiscal 2026?",
+      "reference_answer": "282 million shares for $40.4 billion.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00087",
+        "NVDA-2026-00106"
+      ],
+      "answer": "NVIDIA spent $40.4 billion repurchasing its shares in fiscal 2026, when it bought back 282 million shares. [NVDA-2026-00087] This is consistent with the figure given in the capital return discussion and the equity note, which also cite 282 million shares repurchased for $40.4 billion. [NVDA-2026-00172] [NVDA-2026-00106]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00087",
+        "NVDA-2026-00172",
+        "NVDA-2026-00106"
+      ],
+      "retrieved": [
+        "NVDA-2026-00088",
+        "NVDA-2026-00087",
+        "NVDA-2026-00172",
+        "NVDA-2026-00106",
+        "NVDA-2026-00129"
+      ],
+      "hit_rank": 2,
+      "citation_coverage": 1.0,
+      "latency_ms": 1847,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q042",
+      "question": "How much H20 revenue did NVIDIA earn under U.S. export licenses?",
+      "reference_answer": "Approximately $60 million.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00022",
+        "NVDA-2026-00064",
+        "NVDA-2026-00065",
+        "NVDA-2026-00092"
+      ],
+      "answer": "NVIDIA reported that it generated approximately $60 million in H20 revenue under the licenses the U.S. government granted in August 2025 to ship certain H20 products to certain China-based customers. [NVDA-2026-00064]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00064"
+      ],
+      "retrieved": [
+        "NVDA-2026-00064",
+        "NVDA-2026-00092",
+        "NVDA-2026-00065",
+        "NVDA-2026-00022",
+        "NVDA-2026-00102"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.5,
+      "latency_ms": 1843,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 1.0,
+      "faithfulness": 1.0
+    },
+    {
+      "id": "q043",
+      "question": "When did NVIDIA buy Mellanox and what did it add?",
+      "reference_answer": "In 2020; it added networking and made NVIDIA's platforms data-center scale.",
+      "should_refuse": false,
+      "source_chunk_ids": [
+        "NVDA-2026-00007"
+      ],
+      "answer": "It also enabled NVIDIA's platforms to be data center scale and led to the introduction of a new processor class, the data processing unit (DPU). [NVDA-2026-00007]\n\nLater, the Data Center section describes the networking offerings that followed, including NVLink interconnects and switches, end-to-end platforms for InfiniBand and Ethernet (with network adapters, cables, DPUs, switch chips and systems), and related software. [NVDA-2026-00010]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00007",
+        "NVDA-2026-00010"
+      ],
+      "retrieved": [
+        "NVDA-2026-00007",
+        "NVDA-2026-00063",
+        "NVDA-2026-00091",
+        "NVDA-2026-00009",
+        "NVDA-2026-00010"
+      ],
+      "hit_rank": 1,
+      "citation_coverage": 0.667,
+      "latency_ms": 1963,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank",
+      "context_recall": 1.0,
+      "answer_correctness": 0.5,
+      "faithfulness": 0.429
+    },
+    {
+      "id": "q053",
+      "question": "What will Apple's revenue be in 2030?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "AAPL-2026-00110",
+        "AAPL-2026-00083",
+        "AAPL-2026-00086",
+        "AAPL-2026-00104",
+        "AAPL-2026-00087"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.0,
+      "latency_ms": 1862,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q054",
+      "question": "What were Ford Motor Company's main risk factors?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "The excerpts provided cover NVIDIA's FY2026 10-K risk factors and a portion of Tesla's FY2025 10-K risk factors, but nothing from Ford Motor Company's annual report. [NVDA-2026-00029] [TSLA-2025-00058]\n\n For example, NVIDIA's listed risks include failure to meet industry needs, supply and manufacturing dependencies, cybersecurity incidents, business disruptions, and regulatory and export restrictions. [NVDA-2026-00029] [NVDA-2026-00030]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00029",
+        "TSLA-2025-00058",
+        "NVDA-2026-00030"
+      ],
+      "retrieved": [
+        "NVDA-2026-00048",
+        "NVDA-2026-00030",
+        "NVDA-2026-00029",
+        "NVDA-2026-00056",
+        "TSLA-2025-00058"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.5,
+      "latency_ms": 2167,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q055",
+      "question": "What is the capital of France?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "low_retrieval_score",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00098",
+        "TSLA-2025-00208",
+        "TSLA-2025-00209",
+        "TSLA-2025-00079",
+        "TSLA-2025-00207"
+      ],
+      "hit_rank": null,
+      "citation_coverage": null,
+      "latency_ms": 880,
+      "prompt_version": "answer_v3_readable",
+      "model": null,
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q056",
+      "question": "What will NVIDIA's stock price be next year?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "The filing also notes that total return is based on historical results and is not intended to indicate future performance. [NVDA-2026-00089]\n\nRecent trading activity is also in the filing: repurchases in the fourth quarter of fiscal 2026 were made at average prices ranging from $179.41 to $198.89 per share. [NVDA-2026-00088]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "NVDA-2026-00089",
+        "NVDA-2026-00088"
+      ],
+      "retrieved": [
+        "NVDA-2026-00089",
+        "NVDA-2026-00088",
+        "NVDA-2026-00002",
+        "NVDA-2026-00087",
+        "NVDA-2026-00106"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.5,
+      "latency_ms": 2083,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q057",
+      "question": "How many employees does Berkshire Hathaway have?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "low_retrieval_score",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00023",
+        "AAPL-2026-00013",
+        "AAPL-2026-00012",
+        "AAPL-2026-00105",
+        "AAPL-2026-00111"
+      ],
+      "hit_rank": null,
+      "citation_coverage": null,
+      "latency_ms": 870,
+      "prompt_version": "answer_v3_readable",
+      "model": null,
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q058",
+      "question": "What was Tesla's total revenue in 2015?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "model_refused",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00118",
+        "TSLA-2025-00090",
+        "TSLA-2025-00182",
+        "TSLA-2025-00127",
+        "TSLA-2025-00194"
+      ],
+      "hit_rank": null,
+      "citation_coverage": null,
+      "latency_ms": 1555,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q059",
+      "question": "What is Rivian's vehicle delivery guidance for 2026?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "TSLA-2025-00074",
+        "NVDA-2026-00092",
+        "TSLA-2025-00075",
+        "NVDA-2026-00104",
+        "NVDA-2026-00102"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.0,
+      "latency_ms": 1627,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q060",
+      "question": "Who will be Apple's CEO in 2030?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "AAPL-2026-00137",
+        "AAPL-2026-00064",
+        "AAPL-2026-00104",
+        "AAPL-2026-00129",
+        "AAPL-2026-00136"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.0,
+      "latency_ms": 1930,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q061",
+      "question": "What was Microsoft's revenue in fiscal year 1995?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "low_retrieval_score",
+      "citations": [],
+      "retrieved": [
+        "NVDA-2026-00080",
+        "TSLA-2025-00003",
+        "AAPL-2026-00003",
+        "NVDA-2026-00020",
+        "NVDA-2026-00027"
+      ],
+      "hit_rank": null,
+      "citation_coverage": null,
+      "latency_ms": 905,
+      "prompt_version": "answer_v3_readable",
+      "model": null,
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q062",
+      "question": "Should I buy Tesla stock right now?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "The risk factors note that the stock has been highly volatile, with a 52-week intra-day high of $498.83 and a low of $214.25 per share. [TSLA-2025-00059] They also flag that Elon Musk may sell shares if he pledges them for loans, for other ventures, or for tax obligations on the 2018 CEO Performance Award, and that such sales could push the price down. [TSLA-2025-00061] Tesla also warns that its guidance may prove inaccurate and that the technologies tied to the 2025 CEO Performance Award may not generate the expected returns. [TSLA-2025-00060] On dividends, Tesla has never paid cash dividends and doesn't expect to in the foreseeable future. [TSLA-2025-00070]",
+      "refused": false,
+      "refusal_reason": null,
+      "citations": [
+        "TSLA-2025-00059",
+        "TSLA-2025-00061",
+        "TSLA-2025-00060",
+        "TSLA-2025-00070"
+      ],
+      "retrieved": [
+        "TSLA-2025-00061",
+        "TSLA-2025-00070",
+        "TSLA-2025-00097",
+        "TSLA-2025-00060",
+        "TSLA-2025-00059"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.5,
+      "latency_ms": 3224,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    },
+    {
+      "id": "q063",
+      "question": "What did Meta report for its third quarter of 2027?",
+      "reference_answer": "",
+      "should_refuse": true,
+      "source_chunk_ids": [],
+      "answer": "I can't answer that from the documents.",
+      "refused": true,
+      "refusal_reason": "unsupported_answer",
+      "citations": [],
+      "retrieved": [
+        "NVDA-2026-00094",
+        "NVDA-2026-00106",
+        "AAPL-2026-00002",
+        "NVDA-2026-00107",
+        "NVDA-2026-00095"
+      ],
+      "hit_rank": null,
+      "citation_coverage": 0.0,
+      "latency_ms": 1824,
+      "prompt_version": "answer_v3_readable",
+      "model": "anthropic:claude-haiku-5-5",
+      "retrieval_mode": "hybrid_rerank"
+    }
+  ]
+}

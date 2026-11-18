@@ -1,6 +1,6 @@
 # Eval runs are traced under the Langfuse environment "eval", so they never count
 # as production traffic in the monitoring (which reads environment "default").
-.PHONY: setup ingest ask serve ui golden ablation eval ci-local test langfuse-env langfuse-up langfuse-down langfuse-logs langfuse-reset traffic metrics dashboard
+.PHONY: setup ingest ask serve ui golden ablation eval ci-local test langfuse-env langfuse-up langfuse-down langfuse-logs langfuse-reset traffic metrics dashboard baseline
 
 # Load .env (Langfuse keys) into every `uv run` when it exists; without it tracing is simply off.
 UV_RUN = uv run $(if $(wildcard .env),--env-file .env)
@@ -32,9 +32,13 @@ test:
 eval:           ## full evaluation on the golden set (RAGAS judge, ~$3.50)
 	LANGFUSE_TRACING_ENVIRONMENT=eval $(UV_RUN) python eval/run_eval.py
 
-ci-local:       ## exactly what GitHub Actions runs: fixture index + gated eval (~$2)
+ci-local:       ## what CI runs on a PR: fixture index + eval + compare with eval/baseline/main.json (~$2)
 	RAG_CHROMA_DIR=data/chroma_ci uv run python -m rag.ingest --from-processed data/fixtures
-	RAG_CHROMA_DIR=data/chroma_ci uv run python eval/run_eval.py --tickers AAPL TSLA NVDA --name ci --gate
+	RAG_CHROMA_DIR=data/chroma_ci LANGFUSE_TRACING_ENVIRONMENT=eval $(UV_RUN) python eval/run_eval.py --tickers AAPL TSLA NVDA --name ci
+	uv run python eval/compare.py eval/baseline/main.json eval/reports/eval_ci.json --comment eval/reports/pr_comment.md
+
+baseline:       ## make the last `make ci-local` report the committed fallback baseline (run on main)
+	mkdir -p eval/baseline && cp eval/reports/eval_ci.json eval/baseline/main.json
 
 # ---------- Observability (Project 3) ----------
 langfuse-env:   ## create .env with random secrets + Langfuse API keys (once)

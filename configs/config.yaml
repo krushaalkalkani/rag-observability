@@ -93,6 +93,21 @@ eval:
     hit_rate@5: 0.80            # a correct source chunk is in the top 5
     refusal_accuracy: 0.85      # refused exactly when it should
     citation_coverage: 0.85     # share of the model's sentences with a valid, supported citation
+  # Phase 3 - regression gate: a PR also fails if it is WORSE THAN MAIN by more than this,
+  # even when it still clears the absolute thresholds above (0.99 -> 0.88 passes a 0.85
+  # floor but is a big regression). Drops are in absolute points (0.03 = 3 points).
+  # Calibrated on two runs of the same system (2026-11-17 vs 2026-11-18, CI subset):
+  # hit rate identical, faithfulness/coverage/correctness moved 0.3-1.2 pts, p95 latency +29%.
+  regression:
+    max_drop:
+      hit_rate@5: 0.02          # retrieval is deterministic (0 change between runs): losing one question fails
+      faithfulness: 0.03        # LLM-judged: observed noise 0.3 pts
+      citation_coverage: 0.03   # observed noise 1.2 pts
+      refusal_accuracy: 0.05    # one of 39 questions may flip (2.6 pts); two may not
+    # p95 over 39 calls to a shared API moved +29% with NO change, so +30% would fail PRs at
+    # random. +50% catches real slowdowns (e.g. a much longer prompt); compared only when both
+    # runs used the same kind of machine.
+    max_p95_latency_increase: 0.50
 
 # ---------- Monitoring (Project 3, Phase 2) ----------
 # `make metrics` pulls finished traces from Langfuse into data/metrics.db, grades a
