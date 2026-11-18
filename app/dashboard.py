@@ -6,7 +6,7 @@
 Built to answer "what got worse, when, and what changed just before?":
 - every chart marks the moments a new prompt_version / config / commit first appeared
   (dashed vertical lines) - the usual suspects for any change in the lines;
-- "Compare prompt versions" puts versions side by side on any metric;
+- "Compare versions" puts prompt versions, configs or commits side by side on any metric;
 - "Worst requests" links straight to the Langfuse trace of each bad request.
 
 All numbers come from rag.monitoring.metrics.summarize - the same definitions the
@@ -186,19 +186,29 @@ right.altair_chart(ts_chart({"faithfulness": "faithfulness"}, f"Faithfulness, {c
                             ".2f", "faithfulness"), use_container_width=True)
 
 # ---------- per-version comparison ----------
-st.subheader("Compare prompt versions")
+st.subheader("Compare versions")
+st.caption("A regression usually lines up with a change. Not every change is a prompt change: "
+           "split by config or commit too (incident 001 was a config change).")
+dims = {"prompt_version": "prompt version", "config_hash": "config", "git_sha": "commit"}
+c1, c2 = st.columns([1, 2])
+dim = c1.selectbox("Compare by", list(dims), format_func=dims.get)
 metric_names = {"citation_coverage": "Citation coverage", "fully_grounded_rate": "Fully grounded answers",
                 "refusal_rate": "Refusal rate", "latency_p95_ms": "p95 latency (ms)", "cost_per_request_usd": "Cost / request",
-                "faithfulness": "Faithfulness", "error_rate": "Error rate"}
-pick = st.selectbox("Metric", list(metric_names), format_func=metric_names.get)
-fmt = ",.0f" if pick.endswith("_ms") else "$.5f" if pick.endswith("_usd") else ".2f" if pick == "faithfulness" else ".0%"
-by_version = buckets[buckets["prompt_version"] != "ALL"]
-st.altair_chart(ts_chart({pick: metric_names[pick]}, f"{metric_names[pick]} by prompt version", fmt, pick,
-                         data=by_version, color_by="prompt_version", height=260), use_container_width=True)
-table = pd.DataFrame([{"prompt_version": v, **summarize(g)} for v, g in req.groupby("prompt_version")])
-st.dataframe(table[["prompt_version", "requests", "latency_p50_ms", "latency_p95_ms", "citation_coverage",
-                    "fully_grounded_rate", "refusal_rate", "error_rate", "faithfulness", "faithfulness_n", "cost_per_request_usd"]],
-             hide_index=True, use_container_width=True)
+                "tokens_per_request": "Tokens / request", "faithfulness": "Faithfulness", "error_rate": "Error rate"}
+pick = c2.selectbox("Metric", list(metric_names), format_func=metric_names.get)
+fmt = (",.0f" if pick.endswith("_ms") or pick == "tokens_per_request" else "$.5f" if pick.endswith("_usd")
+       else ".2f" if pick == "faithfulness" else ".0%")
+# Same bucketing as the charts above, once per version of the chosen dimension.
+by_dim = pd.concat([bucketize(g, bucket).query("prompt_version == 'ALL'").assign(version=str(v))
+                    for v, g in req.groupby(dim, dropna=False)], ignore_index=True)
+st.altair_chart(ts_chart({pick: metric_names[pick]}, f"{metric_names[pick]} by {dims[dim]}", fmt, pick,
+                         data=by_dim, color_by="version", height=260), use_container_width=True)
+table = pd.DataFrame([{dims[dim]: v, "first seen": g["ts"].min(), **summarize(g)} for v, g in req.groupby(dim, dropna=False)])
+st.dataframe(table[[dims[dim], "first seen", "requests", "latency_p50_ms", "latency_p95_ms", "tokens_per_request",
+                    "cost_per_request_usd", "citation_coverage", "fully_grounded_rate", "refusal_rate", "error_rate",
+                    "faithfulness", "faithfulness_n"]].sort_values("first seen"),
+             hide_index=True, use_container_width=True,
+             column_config={"first seen": st.column_config.DatetimeColumn("first seen (UTC)", format="MMM D HH:mm")})
 
 # ---------- what changed when ----------
 with st.expander(f"What changed when ({len(changes)} versions in range)", expanded=False):
