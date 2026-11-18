@@ -1,0 +1,94 @@
+# Central config. Every tunable number lives here, not in code,
+# so experiments are "change one line, re-run" and are easy to compare.
+
+sec:
+  # SEC asks every automated client to identify itself with a name + contact email.
+  # Replace this with your own, or set the SEC_USER_AGENT environment variable.
+  user_agent: "production-rag learning project your-email@example.com"
+  companies: [AAPL, MSFT, NVDA, TSLA, AMZN, GOOGL, META, JPM, NFLX, AMD]
+  filings_per_company: 1        # 1 = only the most recent 10-K
+  max_requests_per_second: 5    # SEC limit is 10; stay well under it
+
+paths:
+  raw_dir: data/raw             # downloaded HTML filings
+  processed_dir: data/processed # parsed text + chunks (JSON, human-readable)
+  chroma_dir: data/chroma       # vector database files
+
+chunking:
+  # Measured in tokens of the embedding model's tokenizer.
+  # bge-small can only "see" 512 tokens, so 500 is the largest size in the
+  # 500-800 range that the embedding model reads in full.
+  chunk_size: 500
+  chunk_overlap: 100
+
+embedding:
+  model: BAAI/bge-small-en-v1.5
+  # bge models were trained with this prefix on queries (not on documents).
+  query_instruction: "Represent this sentence for searching relevant passages: "
+  batch_size: 32
+
+vector_store:
+  collection: tenk_chunks
+
+retrieval:
+  # vector | bm25 | hybrid | hybrid_rerank   (the ablation compares all four)
+  mode: hybrid_rerank
+  candidates_per_retriever: 20  # how many chunks BM25 and vector search each return
+  rrf_k: 60                     # Reciprocal Rank Fusion constant (60 is the standard value)
+  rerank_candidates: 20         # fused chunks sent to the cross-encoder
+  top_k: 5                      # chunks finally given to the LLM
+
+reranker:
+  model: BAAI/bge-reranker-base
+  max_length: 512
+
+guardrails:
+  enabled: true
+  # 1) Retrieval gate: if even the best re-ranked chunk is this irrelevant, refuse
+  #    without calling the LLM. Calibrated on the golden set (see eval/reports/).
+  min_rerank_score: 0.05
+  # 2) Support check per answer sentence (cheap, deterministic, no extra LLM call):
+  min_word_overlap: 0.5         # share of a sentence's content words found in its cited chunks
+  require_numbers_in_source: true  # every number in a sentence must appear in its cited chunks
+  # 3) If fewer than this share of claim sentences survive, refuse the whole answer.
+  min_supported_fraction: 0.5
+
+llm:
+  provider: anthropic           # anthropic | ollama
+  anthropic:
+    model: claude-haiku-5-5
+    max_tokens: 2000
+    effort: low                 # low = fast + cheap; fine for grounded Q&A
+  ollama:
+    model: llama3.2:3b
+    host: http://localhost:11434
+
+# Token prices in USD per 1M tokens, used for the cost estimate on every trace.
+# Local models cost $0 but their tokens are still tracked. (Haiku 5.5 prices are for
+# prompts under 100K tokens - ours are ~3K.) Source: Anthropic pricing, Nov 2026.
+pricing:
+  claude-haiku-5-5: {input: 0.10, output: 0.50}
+  claude-sonnet-5-5: {input: 2.00, output: 10.00}
+  claude-opus-5-5: {input: 4.00, output: 20.00}
+  llama3.2:3b: {input: 0.0, output: 0.0}
+
+prompt:
+  version: answer_v2            # which file in configs/prompts/ to use; logged with every answer
+
+logging:
+  answers_log: logs/answers.jsonl  # one line per answered question (question, answer, version, latency)
+
+eval:
+  # The judge grades answers for RAGAS. It is a different, stronger model than the
+  # answering model, so the system isn't grading its own homework.
+  judge_model: claude-opus-5-5
+  judge_effort: low             # grading is a simple yes/no task; low effort keeps it cheap and fast
+  judge_concurrency: 6
+  # The CI gate: eval/run_eval.py --gate exits with an error (failing the PR) if any
+  # metric is below its threshold. Set a few points under the measured baseline,
+  # so normal LLM noise passes but a real regression fails.
+  thresholds:
+    faithfulness: 0.85          # RAGAS: share of answer claims supported by retrieved chunks
+    hit_rate@5: 0.80            # a correct source chunk is in the top 5
+    refusal_accuracy: 0.85      # refused exactly when it should
+    citation_coverage: 0.85     # share of the model's sentences with a valid, supported citation

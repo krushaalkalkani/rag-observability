@@ -1,0 +1,46 @@
+[project]
+name = "production-rag"
+version = "0.1.0"
+description = "Ask My Docs: RAG over SEC 10-K filings with citations, evaluation and CI gating"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic",              # Claude API client (LLM provider #1)
+    "beautifulsoup4",         # HTML parsing of 10-K filings
+    "lxml",                   # fast HTML parser backend for BeautifulSoup
+    "chromadb",               # local persistent vector database
+    "sentence-transformers",  # local embedding model (bge-small)
+    "pyyaml",                 # config + prompt files
+    "requests",               # SEC EDGAR downloads + Ollama HTTP API
+    "tqdm",                   # progress bars
+    "rank-bm25>=0.2.2",
+    "fastapi>=0.163.1",
+    "uvicorn[standard]>=0.54.0",
+    "streamlit>=1.67.0",
+    "ragas>=0.4.4",           # LLM-judged eval metrics (faithfulness, answer accuracy, context recall)
+    "torch",                  # listed so Linux/CI can pull the small CPU-only build (see below)
+    "langfuse>=5.2.0",
+]
+
+# On Linux (GitHub Actions) use CPU-only PyTorch: same results, ~3 GB less to download.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

@@ -1,0 +1,1707 @@
+{
+  "timestamp": "2026-11-17 12:15",
+  "n_questions": 33,
+  "n_answerable": 27,
+  "prompt_version": "answer_v2",
+  "retrieval": {
+    "vector": {
+      "hit_rate@5": 0.778,
+      "mrr@5": 0.62,
+      "p50_ms": 22
+    },
+    "bm25": {
+      "hit_rate@5": 0.667,
+      "mrr@5": 0.504,
+      "p50_ms": 2
+    },
+    "hybrid": {
+      "hit_rate@5": 0.815,
+      "mrr@5": 0.659,
+      "p50_ms": 50
+    },
+    "hybrid_rerank": {
+      "hit_rate@5": 0.889,
+      "mrr@5": 0.745,
+      "p50_ms": 1440
+    }
+  },
+  "retrieval_ranks": {
+    "q001": {
+      "vector": 2,
+      "bm25": null,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q002": {
+      "vector": 2,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q003": {
+      "vector": null,
+      "bm25": 1,
+      "hybrid": 2,
+      "hybrid_rerank": 1
+    },
+    "q004": {
+      "vector": 1,
+      "bm25": null,
+      "hybrid": null,
+      "hybrid_rerank": 1
+    },
+    "q005": {
+      "vector": 1,
+      "bm25": 3,
+      "hybrid": 1,
+      "hybrid_rerank": 5
+    },
+    "q006": {
+      "vector": 1,
+      "bm25": null,
+      "hybrid": 2,
+      "hybrid_rerank": 2
+    },
+    "q007": {
+      "vector": 2,
+      "bm25": 3,
+      "hybrid": 1,
+      "hybrid_rerank": 3
+    },
+    "q008": {
+      "vector": 2,
+      "bm25": 4,
+      "hybrid": 2,
+      "hybrid_rerank": 1
+    },
+    "q009": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 2
+    },
+    "q010": {
+      "vector": null,
+      "bm25": null,
+      "hybrid": 5,
+      "hybrid_rerank": 1
+    },
+    "q011": {
+      "vector": null,
+      "bm25": null,
+      "hybrid": null,
+      "hybrid_rerank": null
+    },
+    "q012": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q013": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q014": {
+      "vector": null,
+      "bm25": 2,
+      "hybrid": 2,
+      "hybrid_rerank": 4
+    },
+    "q015": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q016": {
+      "vector": null,
+      "bm25": null,
+      "hybrid": null,
+      "hybrid_rerank": null
+    },
+    "q017": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q018": {
+      "vector": 2,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q019": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q020": {
+      "vector": 2,
+      "bm25": 2,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q021": {
+      "vector": 1,
+      "bm25": null,
+      "hybrid": null,
+      "hybrid_rerank": 3
+    },
+    "q022": {
+      "vector": 1,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q023": {
+      "vector": 1,
+      "bm25": 5,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q024": {
+      "vector": null,
+      "bm25": 2,
+      "hybrid": 3,
+      "hybrid_rerank": 1
+    },
+    "q025": {
+      "vector": 2,
+      "bm25": 1,
+      "hybrid": 1,
+      "hybrid_rerank": 1
+    },
+    "q026": {
+      "vector": 4,
+      "bm25": null,
+      "hybrid": null,
+      "hybrid_rerank": null
+    },
+    "q027": {
+      "vector": 1,
+      "bm25": null,
+      "hybrid": 4,
+      "hybrid_rerank": 1
+    }
+  },
+  "gate": [
+    {
+      "id": "q001",
+      "should_refuse": false,
+      "best_rerank": 0.9952
+    },
+    {
+      "id": "q002",
+      "should_refuse": false,
+      "best_rerank": 0.9974
+    },
+    {
+      "id": "q003",
+      "should_refuse": false,
+      "best_rerank": 0.9699
+    },
+    {
+      "id": "q004",
+      "should_refuse": false,
+      "best_rerank": 0.9573
+    },
+    {
+      "id": "q005",
+      "should_refuse": false,
+      "best_rerank": 0.2011
+    },
+    {
+      "id": "q006",
+      "should_refuse": false,
+      "best_rerank": 0.4659
+    },
+    {
+      "id": "q007",
+      "should_refuse": false,
+      "best_rerank": 0.933
+    },
+    {
+      "id": "q008",
+      "should_refuse": false,
+      "best_rerank": 0.9498
+    },
+    {
+      "id": "q009",
+      "should_refuse": false,
+      "best_rerank": 0.9493
+    },
+    {
+      "id": "q010",
+      "should_refuse": false,
+      "best_rerank": 0.9919
+    },
+    {
+      "id": "q011",
+      "should_refuse": false,
+      "best_rerank": 0.3063
+    },
+    {
+      "id": "q012",
+      "should_refuse": false,
+      "best_rerank": 0.9575
+    },
+    {
+      "id": "q013",
+      "should_refuse": false,
+      "best_rerank": 0.3331
+    },
+    {
+      "id": "q014",
+      "should_refuse": false,
+      "best_rerank": 0.6655
+    },
+    {
+      "id": "q015",
+      "should_refuse": false,
+      "best_rerank": 0.2577
+    },
+    {
+      "id": "q016",
+      "should_refuse": false,
+      "best_rerank": 0.079
+    },
+    {
+      "id": "q017",
+      "should_refuse": false,
+      "best_rerank": 0.8785
+    },
+    {
+      "id": "q018",
+      "should_refuse": false,
+      "best_rerank": 0.9934
+    },
+    {
+      "id": "q019",
+      "should_refuse": false,
+      "best_rerank": 0.9797
+    },
+    {
+      "id": "q020",
+      "should_refuse": false,
+      "best_rerank": 0.5469
+    },
+    {
+      "id": "q021",
+      "should_refuse": false,
+      "best_rerank": 0.8012
+    },
+    {
+      "id": "q022",
+      "should_refuse": false,
+      "best_rerank": 0.9367
+    },
+    {
+      "id": "q023",
+      "should_refuse": false,
+      "best_rerank": 0.9963
+    },
+    {
+      "id": "q024",
+      "should_refuse": false,
+      "best_rerank": 0.9981
+    },
+    {
+      "id": "q025",
+      "should_refuse": false,
+      "best_rerank": 0.9877
+    },
+    {
+      "id": "q026",
+      "should_refuse": false,
+      "best_rerank": 0.1768
+    },
+    {
+      "id": "q027",
+      "should_refuse": false,
+      "best_rerank": 0.9944
+    },
+    {
+      "id": "q028",
+      "should_refuse": true,
+      "best_rerank": 0.9381
+    },
+    {
+      "id": "q029",
+      "should_refuse": true,
+      "best_rerank": 0.7734
+    },
+    {
+      "id": "q030",
+      "should_refuse": true,
+      "best_rerank": 0.019
+    },
+    {
+      "id": "q031",
+      "should_refuse": true,
+      "best_rerank": 0.6428
+    },
+    {
+      "id": "q032",
+      "should_refuse": true,
+      "best_rerank": 0.0245
+    },
+    {
+      "id": "q033",
+      "should_refuse": true,
+      "best_rerank": 0.5211
+    }
+  ],
+  "pipeline": {
+    "Vector only": {
+      "refusal_accuracy": 0.879,
+      "answered_rate": 0.852,
+      "cites_correct_source": 0.778,
+      "citation_coverage": 0.962,
+      "p50_latency_ms": 790
+    },
+    "Hybrid (BM25 + vector)": {
+      "refusal_accuracy": 0.939,
+      "answered_rate": 0.926,
+      "cites_correct_source": 0.815,
+      "citation_coverage": 0.987,
+      "p50_latency_ms": 758
+    },
+    "Hybrid + re-rank": {
+      "refusal_accuracy": 0.97,
+      "answered_rate": 0.963,
+      "cites_correct_source": 0.889,
+      "citation_coverage": 0.987,
+      "p50_latency_ms": 1590
+    },
+    "+ citation enforcement": {
+      "refusal_accuracy": 0.97,
+      "answered_rate": 0.963,
+      "cites_correct_source": 0.889,
+      "citation_coverage": 0.981,
+      "p50_latency_ms": 1513
+    }
+  },
+  "pipeline_details": {
+    "Vector only": [
+      {
+        "id": "q001",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple had approximately 167,000 full-time equivalent employees as of September 26, 2026 [AAPL-2026-00012].",
+        "citations": [
+          "AAPL-2026-00012"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q002",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's total net sales in fiscal 2026 were $478,834 million [AAPL-2026-00067]. This figure is also shown as total net sales in the disaggregated revenue table [AAPL-2026-00086] and in the geographic table [AAPL-2026-00111].",
+        "citations": [
+          "AAPL-2026-00067",
+          "AAPL-2026-00086",
+          "AAPL-2026-00111"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q003",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q004",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's headquarters is located in Cupertino, California [AAPL-2026-00056].",
+        "citations": [
+          "AAPL-2026-00056"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q005",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's net sales through indirect distribution channels, such as third-party cellular network carriers and other resellers, accounted for approximately 60% of total net sales in 2026 [AAPL-2026-00007]. The company sells its products and resells third-party products directly to customers through its retail and online stores and its direct sales force [AAPL-2026-00007].",
+        "citations": [
+          "AAPL-2026-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q006",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla states it is highly dependent on the services of Elon Musk, Technoking of Tesla and its Chief Executive Officer [TSLA-2025-00041].\nAlthough Mr. Musk spends significant time with Tesla and is highly active in its management, he does not devote his full time and attention to Tesla [TSLA-2025-00042].\nMr. Musk also currently holds management positions at Space Exploration Technologies Corp., X.AI Holdings Corp. (xAI), Neuralink Corp. and The Boring Company, and is involved in other ventures [TSLA-2025-00042].\nNone of Tesla's key employees is bound by an employment agreement for any specific term, and Tesla may not be able to attract and retain senior leadership necessary to grow its business [TSLA-2025-00041].\nTesla also notes that certain banking institutions have extended credit to Mr. Musk secured by pledges of Tesla common stock, and forced sales could cause the stock price to decline [TSLA-2025-00061].",
+        "citations": [
+          "TSLA-2025-00041",
+          "TSLA-2025-00042",
+          "TSLA-2025-00061"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q007",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla launched its autonomous ride-hailing service, Robotaxi, in June 2025 [TSLA-2025-00006]. The risk factors also state that the company launched its autonomous ride-hailing service in 2025 [TSLA-2025-00055].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00055"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q008",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla deployed 46.7 GWh of energy storage products in 2025 [TSLA-2025-00074].",
+        "citations": [
+          "TSLA-2025-00074"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q009",
+        "refused": false,
+        "reason": null,
+        "answer": "Cybercab is described as Tesla's purpose-built autonomous vehicle [TSLA-2025-00006]. Tesla's Robotaxi business currently operates with Model Y vehicles but, in time, will include Cybercab [TSLA-2025-00006]. The company also refers to its plans to mass produce Cybercab, a purpose-built Robotaxi product [TSLA-2025-00033].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00033"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q010",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q011",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q012",
+        "refused": false,
+        "reason": null,
+        "answer": "- The Chinese government has encouraged customers to buy from China-based competitors and discouraged them from purchasing, importing, or using NVIDIA's data center products, including any China-specific product designed to comply with U.S. export controls [NVDA-2026-00070] [NVDA-2026-00025].\n- China's government publicly questioned whether NVIDIA's H20 products have built-in vulnerabilities, which discouraged customers from purchasing them [NVDA-2026-00068].\n- Increased oversight of digital platform companies may adversely affect NVIDIA's Data Center revenue [NVDA-2026-00070].\n- An agency of the Chinese government announced an Action Plan endorsing new standards for compute performance per watt and per memory bandwidth of accelerators in new and renovated Chinese data centers. The government could modify or implement the plan in a way that prevents NVIDIA from designing products to meet the standard [NVDA-2026-00070].\n- As of the end of fiscal year 2026, NVIDIA was effectively foreclosed from competing in China's data center compute market, a situation it attributes partly to U.S. export controls and the current rules and geopolitical landscape [NVDA-2026-00023] [NVDA-2026-00070].",
+        "citations": [
+          "NVDA-2026-00070",
+          "NVDA-2026-00025",
+          "NVDA-2026-00068",
+          "NVDA-2026-00023"
+        ],
+        "coverage": 0.833
+      },
+      {
+        "id": "q013",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft had approximately 223,000 full-time employees as of June 30, 2026 [MSFT-2026-00015]. Of these, 121,000 were in the U.S. and 102,000 were international [MSFT-2026-00015].",
+        "citations": [
+          "MSFT-2026-00015"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q014",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft Cloud revenue was $214.4 billion in fiscal 2026, up from $168.9 billion in fiscal 2025 [MSFT-2026-00154]. The excerpts do not state the overall Microsoft Cloud growth rate as a percentage.\n- Azure and other cloud services revenue grew 41% [MSFT-2026-00076].\n- Microsoft 365 Commercial cloud revenue grew 17% [MSFT-2026-00075].\n- Server products and cloud services revenue increased 31%, driven by Azure and other cloud services [MSFT-2026-00076].",
+        "citations": [
+          "MSFT-2026-00154",
+          "MSFT-2026-00076",
+          "MSFT-2026-00075"
+        ],
+        "coverage": 0.8
+      },
+      {
+        "id": "q015",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft completed its acquisition of Activision Blizzard on October 13, 2023 [MSFT-2026-00127].",
+        "citations": [
+          "MSFT-2026-00127"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q016",
+        "refused": false,
+        "reason": null,
+        "answer": "Waymo, Alphabet's autonomous driving business, is reported within Other Bets and is in the scaling commercialization stage [GOOGL-2025-00013].\n- Waymo is expanding to more cities domestically, entering international markets, and further scaling operations [GOOGL-2025-00013].\n- Revenues from Other Bets are generated primarily from the sale of autonomous transportation and internet services [GOOGL-2025-00013].\n- Other Bets operate as independent companies, and some have their own boards with independent members and outside investors [GOOGL-2025-00013].",
+        "citations": [
+          "GOOGL-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q017",
+        "refused": false,
+        "reason": null,
+        "answer": "Google uses its Gemini models across all 15 of its half-billion-user products, including seven with two billion users [GOOGL-2025-00009].\nThis is also stated in the FY2025 filing's AI section: all 15 half-billion-user products, including seven with two billion users, use Gemini models [GOOGL-2025-00008].",
+        "citations": [
+          "GOOGL-2025-00009",
+          "GOOGL-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q018",
+        "refused": false,
+        "reason": null,
+        "answer": "Alphabet recorded a $2.1 billion employee compensation charge for Waymo in the fourth quarter of 2025, primarily reflected in research and development expenses, based on estimated stock valuation [GOOGL-2025-00076].",
+        "citations": [
+          "GOOGL-2025-00076"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q019",
+        "refused": false,
+        "reason": null,
+        "answer": "Meta expects to spend approximately 70% of its Reality Labs operating expenses in 2026 on wearables initiatives [META-2025-00012]. The remaining 30% is expected to go to its VR and Horizon initiatives [META-2025-00012]. These expectations are subject to change, and the company applies significant judgment because certain costs are shared across product lines [META-2025-00012].",
+        "citations": [
+          "META-2025-00012"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q020",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon employed approximately 1,576,000 full-time and part-time employees as of December 31, 2025 [AMZN-2025-00007].",
+        "citations": [
+          "AMZN-2025-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q021",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon recorded $2.5 billion of expense in Q3 2025 related to the settlement of a lawsuit with the FTC [AMZN-2025-00084].",
+        "citations": [
+          "AMZN-2025-00084"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q022",
+        "refused": false,
+        "reason": null,
+        "answer": "As of December 31, 2025, Netflix had approximately 16,000 full-time employees [NFLX-2025-00008].",
+        "citations": [
+          "NFLX-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q023",
+        "refused": false,
+        "reason": null,
+        "answer": "Netflix's total deferred revenue was $1,776 million as of December 31, 2025 [NFLX-2025-00116].",
+        "citations": [
+          "NFLX-2025-00116"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q024",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q025",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD's AMD Instinct integrated circuits and AMD Versal FPGAs are subject to controls that prevent shipments to China without a license [AMD-2025-00067].\nThe April 2025 license requirement for China and D5 countries specifically impacts the AMD Instinct MI308 products [AMD-2025-00067].\nAMD incurred approximately $800 million in inventory and related charges in the second quarter of 2025 as a result of that restriction [AMD-2025-00067].",
+        "citations": [
+          "AMD-2025-00067"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q026",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD uses Taiwan Semiconductor Manufacturing Company Limited (TSMC) to produce wafers for its HPC, FPGA and adaptive SoC products [AMD-2025-00024].\nAMD also uses GLOBALFOUNDRIES Inc. (GF) for wafer production, but the excerpt is cut off before describing the scope of that work [AMD-2025-00024].",
+        "citations": [
+          "AMD-2025-00024"
+        ],
+        "coverage": 0.5
+      },
+      {
+        "id": "q027",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD acquired ZT Group Int'l, Inc. (ZT Systems) in March 2025 [AMD-2025-00008]. The acquisition closed on March 31, 2025 [AMD-2025-00150].",
+        "citations": [
+          "AMD-2025-00008",
+          "AMD-2025-00150"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q028",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q029",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q030",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q031",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q032",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q033",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      }
+    ],
+    "Hybrid (BM25 + vector)": [
+      {
+        "id": "q001",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple had approximately 167,000 full-time equivalent employees as of September 26, 2026 [AAPL-2026-00012].",
+        "citations": [
+          "AAPL-2026-00012"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q002",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's total net sales in fiscal 2026 were $478,834 million [AAPL-2026-00111] [AAPL-2026-00067] [AAPL-2026-00068].",
+        "citations": [
+          "AAPL-2026-00111",
+          "AAPL-2026-00067",
+          "AAPL-2026-00068"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q003",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's quarterly cash dividend was $0.27 per share as of September 26, 2026 [AAPL-2026-00071]. The company raised it from $0.26 to $0.27 per share beginning in May 2026 [AAPL-2026-00071].",
+        "citations": [
+          "AAPL-2026-00071"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q004",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q005",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's net sales through indirect distribution channels, which include third-party cellular network carriers and other resellers, accounted for approximately 60% of total net sales during 2026 [AAPL-2026-00007]. The Company sells its products directly through its retail and online stores and its direct sales force [AAPL-2026-00007].",
+        "citations": [
+          "AAPL-2026-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q006",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla states it is highly dependent on Elon Musk, its Technoking and CEO [TSLA-2025-00042]. Mr. Musk does not devote his full time and attention to Tesla, and he holds management positions at Space Exploration Technologies Corp., X.AI Holdings Corp. (\"xAI\"), Neuralink Corp. and The Boring Company, and is involved in other ventures [TSLA-2025-00042]. None of Tesla's key employees is bound by an employment agreement for any specific term, and the company may not be able to attract and retain senior leadership necessary to grow its business [TSLA-2025-00041].\n\nAdditionally, Tesla notes that Mr. Musk may be forced to sell Tesla shares if he pledges them to secure loans or to meet other commitments, which could cause the stock price to decline [TSLA-2025-00061].",
+        "citations": [
+          "TSLA-2025-00042",
+          "TSLA-2025-00041",
+          "TSLA-2025-00061"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q007",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla launched its Robotaxi service, an autonomous ride-hailing platform, in June 2025 [TSLA-2025-00006]. The 10-K also states that the company launched its autonomous ride-hailing service in 2025 [TSLA-2025-00055].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00055"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q008",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla deployed 46.7 GWh of energy storage products in 2025 [TSLA-2025-00074].",
+        "citations": [
+          "TSLA-2025-00074"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q009",
+        "refused": false,
+        "reason": null,
+        "answer": "Cybercab is Tesla's purpose-built autonomous vehicle [TSLA-2025-00006]. It is a purpose-built Robotaxi product [TSLA-2025-00074]. Tesla plans to mass produce Cybercab [TSLA-2025-00033]. Its Robotaxi business currently operates with Model Y vehicles but, in time, will include Cybercab [TSLA-2025-00006].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00074",
+          "TSLA-2025-00033"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q010",
+        "refused": false,
+        "reason": null,
+        "answer": "Blackwell architectures generated the majority of NVIDIA's Data Center revenue in fiscal year 2026 [NVDA-2026-00091].",
+        "citations": [
+          "NVDA-2026-00091"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q011",
+        "refused": false,
+        "reason": null,
+        "answer": "The excerpts do not state NVIDIA's total workforce size or how many employees work in R&D.\n\n- More than 80 percent of the workforce have technical roles [NVDA-2026-00026].\n- More than half of the workforce hold an advanced degree [NVDA-2026-00026].",
+        "citations": [
+          "NVDA-2026-00026"
+        ],
+        "coverage": 0.667
+      },
+      {
+        "id": "q012",
+        "refused": false,
+        "reason": null,
+        "answer": "- The Chinese government has encouraged customers to buy from China-based competitors and discouraged them from purchasing, importing, or using NVIDIA data center products, including any China-specific product designed to comply with U.S. export controls [NVDA-2026-00070] [NVDA-2026-00025].\n- An agency of the Chinese government announced an Action Plan endorsing new standards for compute performance per watt and per memory bandwidth of accelerators in new and renovated data centers in China [NVDA-2026-00070].\n- NVIDIA states that the Chinese government could modify or implement the Action Plan in a way that effectively prevents it from designing products to meet the new standard [NVDA-2026-00070].\n- Increased Chinese government oversight of digital platform companies may adversely affect NVIDIA's Data Center revenue, even if it is able to participate in the China data center compute market [NVDA-2026-00070].\n- China's government publicly questioned whether NVIDIA's H20 products have built-in vulnerabilities, which discouraged customers from purchasing them; NVIDIA responded that its GPUs do not include such vulnerabilities [NVDA-2026-00068].\n- As of the end of fiscal year 2026, NVIDIA was effectively foreclosed from competing in China's data center compute market, a situation that also helped competitors build larger ecosystems [NVDA-2026-00023].",
+        "citations": [
+          "NVDA-2026-00070",
+          "NVDA-2026-00025",
+          "NVDA-2026-00068",
+          "NVDA-2026-00023"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q013",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft had approximately 223,000 full-time employees as of June 30, 2026 [MSFT-2026-00015].",
+        "citations": [
+          "MSFT-2026-00015"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q014",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft Cloud revenue increased 27% to $214.4 billion in fiscal 2026 [MSFT-2026-00068]. Azure and other cloud services revenue increased 41% [MSFT-2026-00068]. Microsoft Cloud revenue was $168.9 billion in fiscal 2025 [MSFT-2026-00154].",
+        "citations": [
+          "MSFT-2026-00068",
+          "MSFT-2026-00154"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q015",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft completed its acquisition of Activision Blizzard on October 13, 2023 [MSFT-2026-00127].",
+        "citations": [
+          "MSFT-2026-00127"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q016",
+        "refused": false,
+        "reason": null,
+        "answer": "Waymo, Alphabet's Other Bets business that scales commercialization, is expanding to more cities domestically, entering international markets, and further scaling operations [GOOGL-2025-00013].\n\nAlphabet says Other Bets are at various stages of development, and some are already generating revenue [GOOGL-2025-00013].\n\nRevenues from Other Bets come primarily from the sale of autonomous transportation and internet services [GOOGL-2025-00013].",
+        "citations": [
+          "GOOGL-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q017",
+        "refused": false,
+        "reason": null,
+        "answer": "Today, all 15 of our half-billion-user products, including seven with two billion users, use our Gemini models [GOOGL-2025-00009].\nThe company describes the AI approach as a full-stack one, with Gemini 3 as its most intelligent model yet, and states that Gemini is embedded across its products and platforms [GOOGL-2025-00008].",
+        "citations": [
+          "GOOGL-2025-00009",
+          "GOOGL-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q018",
+        "refused": false,
+        "reason": null,
+        "answer": "Alphabet recorded a $2.1 billion employee compensation charge for Waymo in the fourth quarter of 2025, primarily reflected in research and development expenses, based on estimated stock valuation [GOOGL-2025-00076].",
+        "citations": [
+          "GOOGL-2025-00076"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q019",
+        "refused": false,
+        "reason": null,
+        "answer": "Meta expects to spend approximately 70% of its Reality Labs operating expenses in 2026 on its wearables initiatives [META-2025-00012].\nThe remaining 30% is planned for its VR and Horizon initiatives [META-2025-00012].\nMeta notes it applies significant judgment to this breakdown because certain costs are shared across product lines, and the expectations are subject to change [META-2025-00013].",
+        "citations": [
+          "META-2025-00012",
+          "META-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q020",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon employed approximately 1,576,000 full-time and part-time employees as of December 31, 2025 [AMZN-2025-00007]. The company also uses independent contractors and temporary personnel to supplement its workforce [AMZN-2025-00007].",
+        "citations": [
+          "AMZN-2025-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q021",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q022",
+        "refused": false,
+        "reason": null,
+        "answer": "As of December 31, 2025, Netflix had approximately 16,000 full-time employees [NFLX-2025-00008].",
+        "citations": [
+          "NFLX-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q023",
+        "refused": false,
+        "reason": null,
+        "answer": "Netflix's total deferred revenue as of December 31, 2025 was $1,776 million [NFLX-2025-00116].",
+        "citations": [
+          "NFLX-2025-00116"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q024",
+        "refused": false,
+        "reason": null,
+        "answer": "JPMorgan's Standardized CET1 capital ratio at December 31, 2025 was 14.6% [JPM-2025-00208]. This reflects Standardized CET1 capital of $288,469 million [JPM-2025-00210].",
+        "citations": [
+          "JPM-2025-00208",
+          "JPM-2025-00210"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q025",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD's Instinct MI308 products were hit by the April 2025 U.S. license requirement for exports to China [AMD-2025-00067].\n\nExport controls also prevent AMD from shipping certain Instinct integrated circuits and certain Versal FPGAs to China without a license [AMD-2025-00067].",
+        "citations": [
+          "AMD-2025-00067"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q026",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD relies on TSMC, UMC and its other foundries to produce wafers for its IC products [AMD-2025-00052].\nTSMC manufactures AMD's newest IC products, and AMD is presently focusing its 7 nm and lower microprocessor and GPU portfolio on TSMC's processes [AMD-2025-00052].",
+        "citations": [
+          "AMD-2025-00052"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q027",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD acquired ZT Systems, a provider of AI and general-purpose compute infrastructure for hyperscale computing companies, on March 31, 2025 [AMD-2025-00150]. The total purchase consideration was $4.4 billion [AMD-2025-00150]. In October 2025, AMD sold the ZT data center infrastructure manufacturing business to Sanmina Corporation [AMD-2025-00008].",
+        "citations": [
+          "AMD-2025-00150",
+          "AMD-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q028",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q029",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q030",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q031",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q032",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q033",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      }
+    ],
+    "Hybrid + re-rank": [
+      {
+        "id": "q001",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple had approximately 167,000 full-time equivalent employees as of September 26, 2026 [AAPL-2026-00013].",
+        "citations": [
+          "AAPL-2026-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q002",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's total net sales in fiscal 2026 were $478,834 million [AAPL-2026-00112]. This matches the segment total [AAPL-2026-00066] and the category total [AAPL-2026-00067].",
+        "citations": [
+          "AAPL-2026-00112",
+          "AAPL-2026-00066",
+          "AAPL-2026-00067"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q003",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's quarterly cash dividend was $0.27 per share as of September 26, 2026 [AAPL-2026-00071]. The dividend was raised from $0.26 to $0.27 per share beginning in May 2026 [AAPL-2026-00071].",
+        "citations": [
+          "AAPL-2026-00071"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q004",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's headquarters is located in Cupertino, California [AAPL-2026-00056].",
+        "citations": [
+          "AAPL-2026-00056"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q005",
+        "refused": false,
+        "reason": null,
+        "answer": "Approximately 60% of Apple's total net sales in 2026 came through its indirect distribution channels, which include third-party cellular network carriers and other resellers [AAPL-2026-00007].",
+        "citations": [
+          "AAPL-2026-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q006",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla states it is highly dependent on Elon Musk, its Technoking and CEO, and that he does not devote his full time and attention to Tesla [TSLA-2025-00042]. He also holds management positions at other companies, including Space Exploration Technologies Corp., xAI, Neuralink Corp. and The Boring Company [TSLA-2025-00042].\n\nTesla also flags related risks tied to Musk's personal financial situation:\n- Banking institutions have in the past extended credit to Musk secured by pledges of Tesla common stock [TSLA-2025-00061].\n- If the stock price declined substantially, Musk may be forced to sell Tesla shares to satisfy loan obligations, which could cause the stock price to decline [TSLA-2025-00061].\n- Musk may also need to sell shares for other ventures or to satisfy tax obligations related to the 2018 CEO Performance Award [TSLA-2025-00061].",
+        "citations": [
+          "TSLA-2025-00042",
+          "TSLA-2025-00061"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q007",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla launched its Robotaxi service, an autonomous ride-hailing platform, in June 2025 [TSLA-2025-00006]. Tesla also stated it launched its autonomous ride-hailing service in 2025 [TSLA-2025-00055].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00055"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q008",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla deployed 46.7 GWh of energy storage products in 2025 [TSLA-2025-00074].",
+        "citations": [
+          "TSLA-2025-00074"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q009",
+        "refused": false,
+        "reason": null,
+        "answer": "Cybercab is Tesla's purpose-built autonomous vehicle, which will be included in its Robotaxi business over time [TSLA-2025-00006]. Tesla has plans to mass produce Cybercab, a purpose-built Robotaxi product [TSLA-2025-00032]. The Robotaxi business currently operates with Model Y vehicles [TSLA-2025-00006].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00032"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q010",
+        "refused": false,
+        "reason": null,
+        "answer": "Blackwell architectures represented the majority of NVIDIA's Data Center revenue in fiscal year 2026 [NVDA-2026-00091]. Data Center computing revenue grew 59% on demand for the Blackwell computing platform [NVDA-2026-00100].",
+        "citations": [
+          "NVDA-2026-00091",
+          "NVDA-2026-00100"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q011",
+        "refused": false,
+        "reason": null,
+        "answer": "The excerpts do not state NVIDIA's total workforce size or how many employees work in R&D.\nThe excerpts do say that more than 80 percent of the workforce have technical roles [NVDA-2026-00026].\nThey also say more than half of the workforce hold an advanced degree [NVDA-2026-00026].",
+        "citations": [
+          "NVDA-2026-00026"
+        ],
+        "coverage": 0.667
+      },
+      {
+        "id": "q012",
+        "refused": false,
+        "reason": null,
+        "answer": "The Chinese government has encouraged customers to buy from China-based competitors and discouraged them from purchasing, importing, or using NVIDIA's data center products, including any China-specific product designed to comply with U.S. export controls [NVDA-2026-00070] [NVDA-2026-00024].\n- Increased oversight of digital platform companies may adversely affect Data Center revenue, even if NVIDIA is able to participate in the China data center compute market [NVDA-2026-00070].\n- An agency of the Chinese government announced an Action Plan endorsing new compute performance per watt and per memory bandwidth standards for accelerators in new and renovated China data centers [NVDA-2026-00070].\n- The Chinese government could modify or implement that Action Plan in a way that effectively prevents NVIDIA from designing products to meet the new standard, which may restrict customers' use of some of its data center products [NVDA-2026-00070].\n- As of the end of fiscal year 2026, NVIDIA was effectively foreclosed from competing in China's data center compute market, which it attributes to the current rules and geopolitical landscape, since it cannot deliver a product approved by both the USG and the Chinese government [NVDA-2026-00023].",
+        "citations": [
+          "NVDA-2026-00070",
+          "NVDA-2026-00024",
+          "NVDA-2026-00023"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q013",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft had approximately 223,000 full-time employees as of June 30, 2026 [MSFT-2026-00015].",
+        "citations": [
+          "MSFT-2026-00015"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q014",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft Cloud revenue increased 27% to $214.4 billion in fiscal 2026 [MSFT-2026-00068]. Azure and other cloud services revenue increased 41% [MSFT-2026-00068]. Microsoft 365 Commercial cloud revenue increased 17% [MSFT-2026-00068], and Microsoft 365 Consumer cloud revenue increased 28% [MSFT-2026-00068].",
+        "citations": [
+          "MSFT-2026-00068"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q015",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft completed its acquisition of Activision Blizzard on October 13, 2023 [MSFT-2026-00127].",
+        "citations": [
+          "MSFT-2026-00127"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q016",
+        "refused": false,
+        "reason": null,
+        "answer": "Waymo, Alphabet's autonomous driving business, is in the commercialization stage within Other Bets, and it is expanding to more cities domestically, entering international markets, and further scaling operations [GOOGL-2025-00013].\nRevenues from Other Bets are generated primarily from the sale of autonomous transportation and internet services [GOOGL-2025-00013].",
+        "citations": [
+          "GOOGL-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q017",
+        "refused": false,
+        "reason": null,
+        "answer": "Today, all 15 of its half-billion-user products, including seven with two billion users, use Gemini models [GOOGL-2025-00009].\nGoogle's Gemini models are used across its products in this way, as stated in the FY2025 filing [GOOGL-2025-00008].",
+        "citations": [
+          "GOOGL-2025-00009",
+          "GOOGL-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q018",
+        "refused": false,
+        "reason": null,
+        "answer": "Alphabet recorded a $2.1 billion employee compensation charge for Waymo in the fourth quarter of 2025, primarily reflected in research and development expenses, based on estimated stock valuation [GOOGL-2025-00076].",
+        "citations": [
+          "GOOGL-2025-00076"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q019",
+        "refused": false,
+        "reason": null,
+        "answer": "Meta expects to spend approximately 70% of its Reality Labs operating expenses in 2026 on its wearables initiatives [META-2025-00013].\nThe remaining 30% is expected to go to its VR and Horizon initiatives [META-2025-00013].\nThis breakdown involves significant judgment because some costs are shared across product lines, and the expectations are subject to change [META-2025-00013].",
+        "citations": [
+          "META-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q020",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon employed approximately 1,576,000 full-time and part-time employees as of December 31, 2025 [AMZN-2025-00007].",
+        "citations": [
+          "AMZN-2025-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q021",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon recorded $2.5 billion of expense in Q3 2025 related to the settlement of a lawsuit with the FTC [AMZN-2025-00084]. This charge was recorded in \"Other operating expense (income), net\" and impacted the North America segment [AMZN-2025-00084].",
+        "citations": [
+          "AMZN-2025-00084"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q022",
+        "refused": false,
+        "reason": null,
+        "answer": "As of December 31, 2025, Netflix had approximately 16,000 full-time employees [NFLX-2025-00008].",
+        "citations": [
+          "NFLX-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q023",
+        "refused": false,
+        "reason": null,
+        "answer": "Netflix's total deferred revenue was $1,776 million as of December 31, 2025 [NFLX-2025-00116]. The balance sheet shows deferred revenue of $1,775,730 thousand at that date [NFLX-2025-00101].",
+        "citations": [
+          "NFLX-2025-00116",
+          "NFLX-2025-00101"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q024",
+        "refused": false,
+        "reason": null,
+        "answer": "JPMorgan's Standardized CET1 capital ratio at December 31, 2025 was 14.6% [JPM-2025-00629].\n\nThe Standardized CET1 ratio includes an approximately 25 basis point decrease related to the Apple Card transaction [JPM-2025-00208].",
+        "citations": [
+          "JPM-2025-00629",
+          "JPM-2025-00208"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q025",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD's AMD Instinct MI308 products were hit by the April 2025 U.S. export license requirement for China [AMD-2025-00067]. The restriction led to approximately $800 million in inventory and related charges in the second quarter of 2025 [AMD-2025-00108].",
+        "citations": [
+          "AMD-2025-00067",
+          "AMD-2025-00108"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q026",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q027",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD acquired ZT Group Int'l, Inc. (ZT Systems) in March 2025 [AMD-2025-00008]. The acquisition closed on March 31, 2025, for a total purchase consideration of $4.4 billion [AMD-2025-00150].",
+        "citations": [
+          "AMD-2025-00008",
+          "AMD-2025-00150"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q028",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q029",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q030",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q031",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q032",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q033",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      }
+    ],
+    "+ citation enforcement": [
+      {
+        "id": "q001",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple had approximately 167,000 full-time equivalent employees as of September 26, 2026 [AAPL-2026-00013].",
+        "citations": [
+          "AAPL-2026-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q002",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's total net sales in fiscal 2026 were $478,834 million [AAPL-2026-00112]. This matches the segment total of $478,834 million [AAPL-2026-00066].",
+        "citations": [
+          "AAPL-2026-00112",
+          "AAPL-2026-00066"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q003",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's quarterly cash dividend was $0.27 per share as of September 26, 2026 [AAPL-2026-00071]. The dividend was raised from $0.26 to $0.27 per share beginning in May 2026 [AAPL-2026-00071].",
+        "citations": [
+          "AAPL-2026-00071"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q004",
+        "refused": false,
+        "reason": null,
+        "answer": "Apple's headquarters is located in Cupertino, California [AAPL-2026-00056].",
+        "citations": [
+          "AAPL-2026-00056"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q005",
+        "refused": false,
+        "reason": null,
+        "answer": "Approximately 60% of Apple's total net sales in 2026 came through indirect distribution channels, such as third-party cellular network carriers and other resellers [AAPL-2026-00007]. The Company sells its products directly to customers through its retail and online stores and its direct sales force, with indirect channels making up the remainder of sales [AAPL-2026-00007].",
+        "citations": [
+          "AAPL-2026-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q006",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla states it is highly dependent on Elon Musk, its Technoking and CEO, and that he does not devote his full time and attention to Tesla [TSLA-2025-00042]. He also holds management positions at other companies, including Space Exploration Technologies Corp., xAI, Neuralink Corp. and The Boring Company [TSLA-2025-00042].\n\nRelated risks the filing describes:\n- Certain banks have extended credit to Musk secured by pledges of Tesla common stock, and a substantial stock price decline could force him to sell shares to satisfy loan obligations [TSLA-2025-00061].\n- Musk may need to sell shares to meet commitments to other ventures or tax obligations from the 2018 CEO Performance Award, and such sales could cause the stock price to decline [TSLA-2025-00061].\n- The product goals under the 2025 CEO Performance Award were designed to incentivize Musk, and investments tied to them may not deliver expected benefits, which could lead to write-downs and negatively affect financial performance and stock price [TSLA-2025-00061].",
+        "citations": [
+          "TSLA-2025-00042",
+          "TSLA-2025-00061"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q007",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla launched its Robotaxi service, an autonomous ride-hailing platform, in June 2025 [TSLA-2025-00006]. The company also stated it launched its autonomous ride-hailing service in 2025 [TSLA-2025-00055].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00055"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q008",
+        "refused": false,
+        "reason": null,
+        "answer": "Tesla deployed 46.7 GWh of energy storage products in 2025 [TSLA-2025-00074].",
+        "citations": [
+          "TSLA-2025-00074"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q009",
+        "refused": false,
+        "reason": null,
+        "answer": "Cybercab is Tesla's purpose-built autonomous vehicle, and it will be included in the Robotaxi business in time [TSLA-2025-00006]. Tesla has plans to mass produce Cybercab, described as a purpose-built Robotaxi product [TSLA-2025-00032]. The company's Robotaxi business currently operates with Model Y vehicles [TSLA-2025-00006].",
+        "citations": [
+          "TSLA-2025-00006",
+          "TSLA-2025-00032"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q010",
+        "refused": false,
+        "reason": null,
+        "answer": "Blackwell architectures represented the majority of NVIDIA's Data Center revenue in fiscal year 2026 [NVDA-2026-00091].",
+        "citations": [
+          "NVDA-2026-00091"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q011",
+        "refused": false,
+        "reason": null,
+        "answer": "NVIDIA's workforce is more than 80 percent in technical roles, and more than half of the workforce holds an advanced degree [NVDA-2026-00026].\n- Over 40 percent of new hires in fiscal year 2026 came from employee referrals [NVDA-2026-00026].\n- The fiscal year 2026 turnover rate was 3.7 percent [NVDA-2026-00026].",
+        "citations": [
+          "NVDA-2026-00026"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q012",
+        "refused": false,
+        "reason": null,
+        "answer": "- The Chinese government has encouraged customers to buy from NVIDIA's China-based competitors and discouraged them from purchasing, importing, or using its data center products, including any China-specific product designed to comply with U.S. export controls [NVDA-2026-00070] [NVDA-2026-00025].\n- Increased Chinese government oversight of digital platform companies may adversely affect Data Center revenue, even if NVIDIA is able to participate in the China data center compute market [NVDA-2026-00070].\n- An agency of the Chinese government announced an Action Plan endorsing new standards for compute performance per watt and per memory bandwidth of accelerators used in new and renovated China data centers [NVDA-2026-00070].\n- The Chinese government could modify or implement the Action Plan in a way that effectively prevents NVIDIA from designing products to meet the new standard, which may restrict customers' use of some data center products [NVDA-2026-00070].\n- As of the end of fiscal year 2026, NVIDIA was effectively foreclosed from competing in China's data center compute market, and it must obtain approval from both the USG and the Chinese government to return with a competitive product [NVDA-2026-00023].",
+        "citations": [
+          "NVDA-2026-00070",
+          "NVDA-2026-00025",
+          "NVDA-2026-00023"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q013",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft had approximately 223,000 full-time employees as of June 30, 2026 [MSFT-2026-00015].",
+        "citations": [
+          "MSFT-2026-00015"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q014",
+        "refused": false,
+        "reason": null,
+        "answer": "- Microsoft Cloud revenue increased 27% to $214.4 billion in fiscal 2026 [MSFT-2026-00068].\n- Azure and other cloud services revenue increased 41% [MSFT-2026-00068].\n- Microsoft 365 Commercial cloud revenue increased 17% [MSFT-2026-00068].",
+        "citations": [
+          "MSFT-2026-00068"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q015",
+        "refused": false,
+        "reason": null,
+        "answer": "Microsoft completed its acquisition of Activision Blizzard on October 13, 2023 [MSFT-2026-00127].",
+        "citations": [
+          "MSFT-2026-00127"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q016",
+        "refused": false,
+        "reason": null,
+        "answer": "Waymo, Alphabet's autonomous driving business, is in the Other Bets portfolio and is scaling commercialization [GOOGL-2025-00013].\nWaymo is expanding to more cities domestically, entering international markets, and further scaling operations [GOOGL-2025-00013].\nRevenues from Other Bets are generated primarily from the sale of autonomous transportation and internet services [GOOGL-2025-00013].",
+        "citations": [
+          "GOOGL-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q017",
+        "refused": false,
+        "reason": null,
+        "answer": "Today, all 15 of its half-billion-user products, including seven with two billion users, use Gemini models [GOOGL-2025-00009].",
+        "citations": [
+          "GOOGL-2025-00009"
+        ],
+        "coverage": 0.5
+      },
+      {
+        "id": "q018",
+        "refused": false,
+        "reason": null,
+        "answer": "Alphabet recorded a $2.1 billion employee compensation charge for Waymo in the fourth quarter of 2025, primarily reflected in research and development expenses, based on estimated stock valuation [GOOGL-2025-00076].",
+        "citations": [
+          "GOOGL-2025-00076"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q019",
+        "refused": false,
+        "reason": null,
+        "answer": "Meta expects to spend approximately 70% of its Reality Labs operating expenses in 2026 on its wearables initiatives [META-2025-00013]. The remaining 30% is expected to go to its VR and Horizon initiatives [META-2025-00013]. Meta notes that it applies significant judgment to this breakdown because some costs are shared across product lines, and the expectations are subject to change [META-2025-00013].",
+        "citations": [
+          "META-2025-00013"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q020",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon employed approximately 1,576,000 full-time and part-time employees as of December 31, 2025 [AMZN-2025-00007].",
+        "citations": [
+          "AMZN-2025-00007"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q021",
+        "refused": false,
+        "reason": null,
+        "answer": "Amazon recorded $2.5 billion of expense in Q3 2025 related to the settlement of a lawsuit with the FTC [AMZN-2025-00084]. This charge was recorded in \"Other operating expense (income), net\" and impacted the North America segment [AMZN-2025-00084].",
+        "citations": [
+          "AMZN-2025-00084"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q022",
+        "refused": false,
+        "reason": null,
+        "answer": "As of December 31, 2025, Netflix had approximately 16,000 full-time employees [NFLX-2025-00008].",
+        "citations": [
+          "NFLX-2025-00008"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q023",
+        "refused": false,
+        "reason": null,
+        "answer": "Netflix's total deferred revenue as of December 31, 2025 was $1,776 million [NFLX-2025-00116]. The balance sheet shows deferred revenue of $1,775,730 thousand at that date [NFLX-2025-00101].",
+        "citations": [
+          "NFLX-2025-00116",
+          "NFLX-2025-00101"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q024",
+        "refused": false,
+        "reason": null,
+        "answer": "JPMorgan's Standardized CET1 capital ratio was 14.6% as of December 31, 2025 [JPM-2025-00629]. This ratio includes a decrease of approximately 25 basis points under the Standardized approach related to the Apple Card transaction [JPM-2025-00208].",
+        "citations": [
+          "JPM-2025-00629",
+          "JPM-2025-00208"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q025",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD's Instinct MI308 products were hit by the April 2025 U.S. license requirement for exports to China [AMD-2025-00067]. The restriction led to approximately $800 million in inventory and related charges in the second quarter of 2025 [AMD-2025-00057].\n\nSeparately, October 2023 export requirements prevent AMD from shipping certain AMD Instinct integrated circuits and certain AMD Versal FPGAs to China without a license [AMD-2025-00066].",
+        "citations": [
+          "AMD-2025-00067",
+          "AMD-2025-00057",
+          "AMD-2025-00066"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q026",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q027",
+        "refused": false,
+        "reason": null,
+        "answer": "AMD acquired ZT Group Int'l, Inc. (ZT Systems) in March 2025 [AMD-2025-00008]. The acquisition closed on March 31, 2025, for a total purchase consideration of $4.4 billion [AMD-2025-00150].",
+        "citations": [
+          "AMD-2025-00008",
+          "AMD-2025-00150"
+        ],
+        "coverage": 1.0
+      },
+      {
+        "id": "q028",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q029",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q030",
+        "refused": true,
+        "reason": "low_retrieval_score",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q031",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q032",
+        "refused": true,
+        "reason": "low_retrieval_score",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      },
+      {
+        "id": "q033",
+        "refused": true,
+        "reason": "model_refused",
+        "answer": "I can't answer that from the documents.",
+        "citations": [],
+        "coverage": null
+      }
+    ]
+  }
+}

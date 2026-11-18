@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.env
+
+# Data is rebuilt by `make ingest`
+data/raw/*
+data/processed/*
+data/chroma/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+data/chroma_ci/
+logs/
+.claude/

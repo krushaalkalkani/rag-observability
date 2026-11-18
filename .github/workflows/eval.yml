@@ -1,0 +1,72 @@
+# Quality gate: every pull request builds an index from a small fixture corpus,
+# runs the evaluation, and FAILS if answer quality drops below the thresholds
+# in configs/config.yaml (eval.thresholds).
+#
+# Setup once: repo Settings -> Secrets and variables -> Actions -> New secret
+#   ANTHROPIC_API_KEY  (used for the answering model and the RAGAS judge, ~$2 per run)
+name: eval-gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:  # a new push to the same PR cancels the old run (saves time and API cost)
+  group: eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run pytest -q
+
+  eval-gate:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      RAG_CHROMA_DIR: data/chroma_ci
+      HF_HUB_DISABLE_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Require API key
+        # A skipped gate is no gate: fail loudly instead of silently passing.
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY secret is not set - the eval gate cannot run."
+            exit 1
+          fi
+
+      - run: uv sync --locked
+
+      - name: Cache embedding + re-ranker models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('configs/config.yaml') }}
+
+      - name: Build index from fixture corpus (AAPL, TSLA, NVDA)
+        run: uv run python -m rag.ingest --from-processed data/fixtures
+
+      - name: Run eval and enforce thresholds
+        run: uv run python eval/run_eval.py --tickers AAPL TSLA NVDA --name ci --gate
+
+      - name: Publish report to the job summary
+        if: always()
+        run: cat eval/reports/eval_ci.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: eval/reports/eval_ci.*
