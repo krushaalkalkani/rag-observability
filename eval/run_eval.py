@@ -39,6 +39,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from rag.config import load_config  # noqa: E402
 from rag.guardrails import CITATION_GROUP_RE  # noqa: E402
+from rag.judge import make_judge  # noqa: E402
 from rag.pipeline import answer_question  # noqa: E402
 from rag.retrieve import retrieve  # noqa: E402
 
@@ -46,38 +47,6 @@ GATED = ["faithfulness", "hit_rate@5", "refusal_accuracy", "citation_coverage"]
 
 
 # ---------------------------------------------------------------- judge (RAGAS)
-class UsageCounter:
-    """Wraps the Anthropic client so we can report what the judge cost."""
-
-    def __init__(self, client):
-        self.input_tokens = self.output_tokens = self.calls = 0
-        original = client.messages.create
-
-        async def counted(*args, **kwargs):
-            resp = await original(*args, **kwargs)
-            self.calls += 1
-            self.input_tokens += resp.usage.input_tokens
-            self.output_tokens += resp.usage.output_tokens
-            return resp
-
-        client.messages.create = counted
-
-
-def make_judge(model: str, effort: str):
-    import instructor
-    from anthropic import AsyncAnthropic
-    from ragas.llms import llm_factory
-
-    client = AsyncAnthropic()
-    usage = UsageCounter(client)
-    # JSON mode (not forced tool calls): Opus 5.5 rejects forced tool_choice.
-    llm = llm_factory(
-        model, provider="anthropic", client=client, mode=instructor.Mode.ANTHROPIC_JSON,
-        max_tokens=8000, output_config={"effort": effort},
-    )
-    return llm, usage
-
-
 async def judge_all(rows: list[dict], cfg: dict) -> dict:
     from ragas.metrics.collections import AnswerAccuracy, ContextRecall, Faithfulness
 

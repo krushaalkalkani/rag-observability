@@ -107,3 +107,103 @@ This runs Langfuse server v4 ("events" storage). Its public API no longer serves
 `GET /api/public/traces` or reading scores; read observations with the SDK's
 `Langfuse().iter_observation_pages(trace_id=...)` (ask for the `time` field group
 to get time-to-first-token). Writing scores works as before.
+
+---
+
+# Observability, Phase 2 — quality metrics over time
+
+Tracing (Phase 1) answers "what happened in *this* request?". Phase 2 answers
+"is the system getting worse, since when, and why?".
+
+```
+Langfuse ──► make metrics ──► data/metrics.db ──► make dashboard (http://localhost:8502)
+              1 collect          requests  (one row per request)
+              2 evaluate         metrics   (rolled up per hour + prompt_version)
+              3 aggregate        alert_state
+              4 alert ──► console + logs/alerts.jsonl (+ Slack if SLACK_WEBHOOK_URL is set)
+```
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `make traffic N=100 RATE=6` | simulated users: golden + generated questions through the real pipeline, 6/min (~$0.0006 each) |
+| `make metrics` | the monitoring job: pull new traces, grade the 10% sample, roll up, check alerts |
+| `make dashboard` | the dashboard on <http://localhost:8502> |
+
+In production `make metrics` would run on a schedule. Locally, e.g. hourly with cron:
+`0 * * * * cd /path/to/03-rag-observability && make metrics >> logs/metrics-job.log 2>&1`
+
+## The metrics
+
+All metrics are defined once, in [`rag/monitoring/metrics.py`](../src/rag/monitoring/metrics.py)
+(`summarize`), and used by the stored table, the alerts and the dashboard alike.
+
+| Metric | Definition | Why |
+|---|---|---|
+| latency p50 / p95 | median / 95th percentile, end to end and per step (retrieval, rerank, LLM, first token) | an average hides the slow tail; p95 is what the unlucky 1-in-20 user gets |
+| cost / request | LLM cost from token counts × the pricing table (refusals before the LLM cost $0) | catches prompt bloat and model swaps |
+| citation coverage | mean share of an answer's sentences backed by the chunk they cite (answered requests) | the cheap, every-request grounding signal |
+| fully grounded rate | share of answers where **every** sentence was backed | stricter version of the above |
+| refusal rate | refused / requests that didn't error | too high = retrieval or prompt broke; too low = guardrails off |
+| error rate | requests where any step failed / all requests | |
+| faithfulness (sampled) | RAGAS faithfulness from the LLM judge on 10% of answered requests | the real hallucination metric — too expensive for every request |
+
+**Online faithfulness without ground truth.** Live questions have no reference
+answer, so correctness can't be checked, but faithfulness can: does each claim come
+from the retrieved chunks? The job picks a stable 10% sample (by trace-id hash),
+rebuilds the exact chunks from the trace, and grades with the same judge as the CI
+eval (`eval.judge_model`), so online and offline numbers are comparable. Scores
+also go back to Langfuse as a `faithfulness` score on the trace. Capped at
+`max_per_run` per job run; ~$0.03 per graded answer.
+
+## Alerts
+
+Rules live in `configs/config.yaml` → `monitoring.alerts.rules` and are checked on
+the last 60 minutes (only with ≥ 10 requests, so 2 bad requests out of 3 can't page
+anyone). A notification goes out only when a rule changes state (FIRING / RESOLVED),
+and a FIRING message carries the first clues: the metric split by `prompt_version`,
+`config_hash` and `git_sha`, plus any version first seen in the window.
+
+### Calibration
+
+Thresholds were set from a 90-request baseline (`make traffic N=90 RATE=6`,
+2026-11-18, `answer_v2`, `hybrid_rerank`, Haiku 5.5, laptop CPU re-ranker): far enough
+beyond normal variation that noise doesn't fire them.
+
+| Metric | Baseline | Threshold | Note |
+|---|---|---|---|
+| p95 latency | 5.8 s (p50 2.5 s) | > 8 s | the spec's example 3 s would fire constantly: the LLM step alone has p95 4.2 s |
+| citation coverage | 95.0% | < 90% | very stable between windows |
+| refusal rate | 30% (28–39% per window) | > 45% | follows what users ask; read it with `refusal_reason` |
+| error rate | 0% | > 2% | |
+| cost / request | $0.00053 | > $0.001 | ~2x: a model swap or prompt bloat |
+| faithfulness (sampled) | 1.00 (n=4) | < 0.85, with ≥ 5 graded | `min_count` stops one bad grade from firing |
+
+Re-calibrate after any intended change to the system (new model, new prompt version).
+
+## Incident drill (runbook)
+
+The point: prove the monitoring can find a real regression and trace it to the exact
+change. Do it like a real incident: one person ships the bad change, then *uses only
+the dashboard and Langfuse* to find it.
+
+1. **Baseline.** `make traffic N=60 RATE=6`, then `make metrics`. The dashboard is
+   green.
+2. **Ship a bad change, and commit it**, so `git_sha` and `config_hash` record it.
+   Suggestions, from obvious to subtle:
+   - `retrieval.top_k: 5 → 2`: fewer chunks, so more refusals and lower coverage;
+   - `retrieval.mode: hybrid_rerank → vector`: the re-ranker is off, so worse chunks
+     and lower faithfulness, but *faster*;
+   - `prompt.version: answer_broken_demo`: the grounding rules are gone.
+3. **Generate traffic.** `make traffic N=60 RATE=6`, then `make metrics`. Note the
+   time the alert fired.
+4. **Investigate from the dashboard:** which metric moved, when, which dashed "first
+   seen" line it lines up with, the version comparison, then open the worst requests
+   in Langfuse and compare their `retrieval` / `rerank` / `citation-check` steps with
+   a healthy trace.
+5. **Roll back** (revert the commit), run more traffic, and watch the alert RESOLVE.
+6. **Write `docs/incident-001.md`:** summary, timeline (UTC), detection (which alert,
+   how long after the change), root cause (the exact config line + commit), evidence
+   (dashboard screenshot and two trace links: bad vs good), fix, and what would have
+   caught it sooner (Phase 3's CI gate).

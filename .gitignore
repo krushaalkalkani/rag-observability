@@ -14,3 +14,4 @@ data/chroma/
 data/chroma_ci/
 logs/
 .claude/
+data/metrics.db

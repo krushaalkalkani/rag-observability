@@ -1,4 +1,6 @@
-.PHONY: setup ingest ask serve ui golden ablation eval ci-local test langfuse-env langfuse-up langfuse-down langfuse-logs langfuse-reset
+# Eval runs are traced under the Langfuse environment "eval", so they never count
+# as production traffic in the monitoring (which reads environment "default").
+.PHONY: setup ingest ask serve ui golden ablation eval ci-local test langfuse-env langfuse-up langfuse-down langfuse-logs langfuse-reset traffic metrics dashboard
 
 # Load .env (Langfuse keys) into every `uv run` when it exists; without it tracing is simply off.
 UV_RUN = uv run $(if $(wildcard .env),--env-file .env)
@@ -22,13 +24,13 @@ golden:         ## rebuild eval/golden_set.jsonl from eval/golden_seed.yaml
 	uv run python eval/build_golden.py
 
 ablation:       ## vector vs hybrid vs hybrid+rerank (+guardrails) -> eval/reports/
-	uv run python eval/ablation.py
+	LANGFUSE_TRACING_ENVIRONMENT=eval $(UV_RUN) python eval/ablation.py
 
 test:
 	uv run pytest -q
 
 eval:           ## full evaluation on the golden set (RAGAS judge, ~$3.50)
-	$(UV_RUN) python eval/run_eval.py
+	LANGFUSE_TRACING_ENVIRONMENT=eval $(UV_RUN) python eval/run_eval.py
 
 ci-local:       ## exactly what GitHub Actions runs: fixture index + gated eval (~$2)
 	RAG_CHROMA_DIR=data/chroma_ci uv run python -m rag.ingest --from-processed data/fixtures
@@ -50,3 +52,12 @@ langfuse-logs:
 
 langfuse-reset: ## DELETE all Langfuse data (volumes) - asks no questions
 	docker compose down -v
+
+traffic:        ## simulated users: make traffic N=100 [RATE=6]  (~$0.0006/request)
+	$(UV_RUN) python scripts/traffic.py --n $(or $(N),50) --per-minute $(or $(RATE),0)
+
+metrics:        ## Langfuse -> data/metrics.db: collect, grade 10% (~$0.03 each), aggregate, alert
+	$(UV_RUN) python -m rag.monitoring.job
+
+dashboard:      ## metrics dashboard on http://localhost:8502
+	$(UV_RUN) streamlit run app/dashboard.py --server.port 8502

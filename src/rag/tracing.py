@@ -68,6 +68,14 @@ def get_langfuse():
     return Langfuse(should_export_span=is_langfuse_span)
 
 
+def _inside_trace() -> bool:
+    """Is a span active right now? (Asked of OpenTelemetry directly: Langfuse's own
+    get_current_trace_id() prints a warning every time the answer is no.)"""
+    from opentelemetry import trace
+
+    return trace.get_current_span().get_span_context().is_valid
+
+
 def _mark_error(obs, exc: Exception) -> None:
     obs.update(level="ERROR", status_message=f"{type(exc).__name__}: {exc}"[:500])
 
@@ -98,7 +106,7 @@ def trace_request(name: str, *, input: Any, user_id: str | None, session_id: str
 def observe(name: str, as_type: str = "span", **kwargs: Any) -> Iterator[Any]:
     """Record one pipeline step as a child of the current trace (no-op outside a trace)."""
     lf = get_langfuse()
-    if lf is None or lf.get_current_trace_id() is None:
+    if lf is None or not _inside_trace():
         yield NOOP
         return
     with lf.start_as_current_observation(name=name, as_type=as_type, **kwargs) as obs:

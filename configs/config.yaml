@@ -13,6 +13,7 @@ paths:
   raw_dir: data/raw             # downloaded HTML filings
   processed_dir: data/processed # parsed text + chunks (JSON, human-readable)
   chroma_dir: data/chroma       # vector database files
+  metrics_db: data/metrics.db   # SQLite: per-request facts + aggregated metrics (Project 3)
 
 chunking:
   # Measured in tokens of the embedding model's tokenizer.
@@ -92,3 +93,36 @@ eval:
     hit_rate@5: 0.80            # a correct source chunk is in the top 5
     refusal_accuracy: 0.85      # refused exactly when it should
     citation_coverage: 0.85     # share of the model's sentences with a valid, supported citation
+
+# ---------- Monitoring (Project 3, Phase 2) ----------
+# `make metrics` pulls finished traces from Langfuse into data/metrics.db, grades a
+# sample for faithfulness, rolls everything up into time buckets, and checks alerts.
+monitoring:
+  environment: default          # Langfuse environment to monitor (eval runs use "eval")
+  bucket: 1h                    # granularity of the stored metrics table
+  resync_minutes: 15            # re-read this much before the last sync (late-arriving traces)
+  online_eval:
+    # Grade a fixed share of live answers with the same judge as the offline eval,
+    # so online faithfulness is comparable to the CI number. ~$0.03 per graded answer.
+    sample_rate: 0.10
+    max_per_run: 50             # cost cap per job run
+  alerts:
+    window_minutes: 60          # rules are checked on requests from the last hour...
+    min_requests: 10            # ...but only if there were enough of them to mean something
+    # Fire when `metric op threshold`. Calibrated on the 90-request baseline of 2026-11-18
+    # (docs/observability.md#calibration): beyond normal variation, so noise doesn't page anyone.
+    rules:
+      # baseline p95 5.8 s (LLM step alone 4.2 s); a 3 s rule would fire constantly
+      - {name: p95_latency_high, metric: latency_p95_ms, op: ">", threshold: 8000}
+      # baseline 95%, very stable between windows
+      - {name: citation_coverage_low, metric: citation_coverage, op: "<", threshold: 0.90}
+      # baseline 0%
+      - {name: error_rate_high, metric: error_rate, op: ">", threshold: 0.02}
+      # baseline 30% (28-39% between windows): it depends on what users ask, so a wide margin
+      - {name: refusal_rate_high, metric: refusal_rate, op: ">", threshold: 0.45}
+      # judged on a 10% sample: wait for at least 5 graded answers before trusting the mean
+      - {name: faithfulness_low, metric: faithfulness, op: "<", threshold: 0.85, min_count: {faithfulness_n: 5}}
+      # baseline $0.00053; ~2x catches a model swap or a ballooning prompt
+      - {name: cost_per_request_high, metric: cost_per_request_usd, op: ">", threshold: 0.001}
+    # Optional Slack: set SLACK_WEBHOOK_URL in .env. Alerts always go to the console
+    # and logs/alerts.jsonl.
