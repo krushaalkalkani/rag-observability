@@ -5,6 +5,10 @@
 > retrieval, re-ranking, the exact LLM prompt, tokens, cost, time-to-first-token and
 > guardrail decisions. Setup and how to read a trace: [docs/observability.md](docs/observability.md).
 > `make langfuse-up`, then `make ask Q="..."` prints a link to the trace.
+> Phase 2 done: p50/p95 latency, cost, citation coverage, refusal/error rate and sampled
+> online faithfulness over time (`make metrics`, `make dashboard`), with calibrated alerts.
+> Incident drill: [docs/incident-001.md](docs/incident-001.md) — a "cost optimization" that
+> silently cut answer evidence, root-caused in under 7 minutes.
 
 Ask a question about 10 companies' latest 10-K annual reports and get an answer with
 citations to the exact source passage, or a refusal when the filings don't contain the answer.
