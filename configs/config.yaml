@@ -74,7 +74,7 @@ pricing:
   llama3.2:3b: {input: 0.0, output: 0.0}
 
 prompt:
-  version: answer_v2            # which file in configs/prompts/ to use; logged with every answer
+  version: answer_v3_readable   # which file in configs/prompts/ to use; logged with every answer
 
 logging:
   answers_log: logs/answers.jsonl  # one line per answered question (question, answer, version, latency)
