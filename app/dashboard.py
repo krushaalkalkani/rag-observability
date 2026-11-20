@@ -75,6 +75,7 @@ if req.empty:
 changes = (req_all.groupby(["prompt_version", "config_hash", "git_sha"], dropna=False)["ts"].min()
            .reset_index().rename(columns={"ts": "first_seen"}).sort_values("first_seen"))
 changes = changes[changes["first_seen"] >= req["ts"].min()]
+changes["first_seen_utc"] = changes["first_seen"].dt.strftime("%b %d %H:%M")
 changes["label"] = changes["prompt_version"] + " · cfg " + changes["config_hash"].fillna("?") + " · " + changes["git_sha"].fillna("?")
 
 # ---------- alerts ----------
@@ -138,6 +139,8 @@ def ts_chart(metrics: dict[str, str], title: str, fmt: str, threshold_metric: st
     # or for every point when there are few.
     seg_size = long.groupby(["series", "segment"])["value"].transform("size")
     long["dot"] = ((seg_size == 1) | (len(long) <= 12)).astype(float) * 0.9
+    # Tooltip time as plain UTC text (Vega-Lite's temporal tooltip formatting printed NaN).
+    long["when"] = long["bucket_start"].dt.strftime("%b %d %H:%M")
     color = alt.Color("series:N", scale=alt.Scale(domain=domain, range=SERIES[: len(domain)]),
                       legend=alt.Legend(title=None, orient="top", direction="horizontal") if len(domain) > 1 else None)
     # Everything in UTC, matching the alert messages and tables.
@@ -148,7 +151,7 @@ def ts_chart(metrics: dict[str, str], title: str, fmt: str, threshold_metric: st
     lines = base.mark_line(strokeWidth=2, interpolate="monotone")
     points = base.mark_circle(size=64).encode(
         opacity=alt.condition(hover, alt.value(1), alt.Opacity("dot:Q", scale=None, legend=None)))
-    tooltip = [alt.Tooltip("bucket_start:T", title="bucket (UTC)", format="%b %d %H:%M", formatType="utc"), alt.Tooltip("series:N"),
+    tooltip = [alt.Tooltip("when:N", title="bucket (UTC)"), alt.Tooltip("series:N"),
                alt.Tooltip("value:Q", format=fmt), alt.Tooltip("requests:Q")]
     rule = alt.Chart(long).mark_rule(color=MUTED).encode(x="bucket_start:T").transform_filter(hover)
     hits = alt.Chart(long).mark_rule(opacity=0, strokeWidth=12).encode(x="bucket_start:T", tooltip=tooltip).add_params(hover)
@@ -156,7 +159,7 @@ def ts_chart(metrics: dict[str, str], title: str, fmt: str, threshold_metric: st
     if not changes.empty:
         layers.append(alt.Chart(changes).mark_rule(strokeDash=[4, 3], color=MUTED, strokeWidth=1).encode(
             x="first_seen:T", tooltip=[alt.Tooltip("label:N", title="first seen"),
-                                       alt.Tooltip("first_seen:T", title="at (UTC)", format="%b %d %H:%M", formatType="utc")]))
+                                       alt.Tooltip("first_seen_utc:N", title="at (UTC)")]))
     subtitle = []
     if threshold_metric and threshold_metric in RULES:
         r = RULES[threshold_metric]

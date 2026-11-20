@@ -12,10 +12,13 @@
 #   ANTHROPIC_API_KEY  (answering model + RAGAS judge, ~$2 per run)
 name: eval-gate
 
+# Docs- and website-only changes can't change answer quality: skip the ~$2 eval for them.
 on:
   pull_request:
+    paths-ignore: ["site/**", "docs/**", "README.md"]
   push:
     branches: [main]
+    paths-ignore: ["site/**", "docs/**", "README.md"]
   workflow_dispatch:
 
 concurrency:  # a new push to the same branch cancels the old run (saves time and API cost)

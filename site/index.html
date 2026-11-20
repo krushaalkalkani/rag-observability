@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAG Observability</title>
+<meta name="description" content="Observability for a production RAG system: every request traced in self-hosted Langfuse, quality and cost tracked with calibrated alerts, an incident root-caused in 6.7 minutes, and a CI gate that blocks quality regressions.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RAG Observability">
+<meta property="og:description" content="Trace it, measure it, gate it. 9 steps traced per request · incident root-caused in 6.7 min · a prompt-only PR blocked when citation coverage fell 95% → 66%.">
+<meta property="og:url" content="https://rag-observability.vercel.app/">
+<meta property="og:image" content="https://rag-observability.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script>
+  // Apply the saved (or system) theme before paint.
+  (function () {
+    try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  })();
+</script>
+<style>
+/* Same system as the production-rag site: one calm reading column; colour lives only
+   inside the dark media panels, in one accent (teal here, magenta there). */
+:root {
+  --bg: #fbfbfa;
+  --text: #1c1c1c;
+  --muted: #6f6f6f;
+  --faint: #808080;
+  --line: #e8e8e6;
+  --code-bg: #f2f2f0;
+  --media-bg: #161616;
+  --m-panel: #1c1c1c;
+  --m-line: #2c2c2c;
+  --m-text: #e6e6e6;
+  --m-muted: #a3a3a3;
+  --m-faint: #8a8a8a;
+  --accent: #2dd4bf;
+  --bad: #f87171;
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --measure: 680px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111111; --text: #e9e9e9; --muted: #8f8f8f; --faint: #6a6a6a;
+    --line: #232323; --code-bg: #191919; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111111; --text: #e9e9e9; --muted: #8f8f8f; --faint: #6a6a6a;
+  --line: #232323; --code-bg: #191919; color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.65 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+img { max-width: 100%; }
+main { max-width: var(--measure); margin: 0 auto; padding-block: 40px 72px; display: grid; gap: 56px; }
+
+a { color: var(--text); text-decoration: underline; text-decoration-color: var(--faint); text-underline-offset: 3px; transition: color .15s, text-decoration-color .15s; }
+a:hover { text-decoration-color: var(--text); }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 3px; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+
+/* ---------- top bar ---------- */
+.topbar { display: flex; align-items: center; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; text-decoration: none; }
+.brand img { width: 22px; height: 22px; border-radius: 6px; }
+.topbar nav { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 14px; }
+.topbar nav a { color: var(--muted); text-decoration: none; }
+.topbar nav a:hover { color: var(--text); }
+.theme-btn { width: 32px; height: 32px; margin-right: -6px; border-radius: 50%; border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; transition: background .15s, color .15s; }
+.theme-btn:hover { background: var(--line); color: var(--text); }
+.theme-btn svg { width: 17px; height: 17px; }
+.theme-btn .sun { display: none; }
+:root[data-theme="dark"] .theme-btn .sun { display: block; }
+:root[data-theme="dark"] .theme-btn .moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-btn .sun { display: block; }
+  :root:not([data-theme="light"]) .theme-btn .moon { display: none; }
+}
+
+/* ---------- hero ---------- */
+.hero { display: grid; gap: 16px; padding-top: 28px; }
+.eyebrow { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.hero h1 { font-size: clamp(32px, 6vw, 46px); line-height: 1.08; font-weight: 700; letter-spacing: -0.025em; }
+.hero h1 span { color: var(--muted); font-weight: 600; }
+.lede { color: var(--muted); font-size: 17px; line-height: 1.6; max-width: 35em; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: 1px solid var(--line); color: var(--text); transition: border-color .15s, background .15s; }
+.btn:hover { border-color: var(--faint); }
+.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+.btn.primary:hover { opacity: .9; }
+.btn svg { width: 16px; height: 16px; }
+
+/* ---------- section scaffolding ---------- */
+section { display: grid; gap: 14px; }
+h2 { font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); line-height: 1.65; }
+h3.sub { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.prose { display: grid; gap: 14px; }
+.note { font-size: 14px; color: var(--muted); }
+code, .mono { font-family: var(--mono); font-size: 12.5px; }
+p code, li code, td code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+
+/* ---------- media panels ---------- */
+figure { margin: 0; display: grid; gap: 10px; }
+.media { background: var(--media-bg); border-radius: 12px; color: var(--m-text); }
+figcaption { font-size: 13px; color: var(--faint); }
+.shot { padding: 8px; }
+figure.wide { --w: min(1080px, calc(100vw - 40px)); width: var(--w); margin-left: calc((100% - var(--w)) / 2); }
+.shot img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.shot a { display: block; }
+
+/* trace tree mock */
+.tree { padding: 20px 22px; font: 13px/1.85 var(--mono); color: var(--m-muted); overflow-x: auto; white-space: pre; }
+.tree b { color: var(--m-text); font-weight: 500; }
+.tree i { font-style: normal; color: var(--m-faint); }
+.tree .acc { color: var(--accent); }
+
+/* rerank evidence mock */
+.mock { padding: 22px; display: grid; gap: 14px; font-size: 14px; }
+.mock-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--m-faint); }
+.mock-q { color: var(--m-text); font-weight: 500; }
+.ev { width: 100%; border-collapse: collapse; font: 12.5px/1.4 var(--mono); }
+.ev th { font: 500 11px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--m-faint); text-align: left; padding: 0 10px 8px 0; }
+.ev td { border-top: 1px solid var(--m-line); padding: 8px 10px 8px 0; color: var(--m-muted); white-space: nowrap; text-align: left; }
+.ev .hit td { color: var(--m-text); }
+.ev td.cut { color: var(--bad); font-weight: 600; }
+.ev td.kept { color: var(--accent); }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ans { background: var(--m-panel); border: 1px solid var(--m-line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.55; }
+.ans .who { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--m-faint); }
+.ans.bad { border-color: rgba(248, 113, 113, .45); }
+.ans mark { background: transparent; color: var(--m-text); box-shadow: inset 0 -1px 0 var(--accent); }
+@media (max-width: 560px) { .answers { grid-template-columns: minmax(0, 1fr); } }
+
+/* PR comment mock */
+.pr { padding: 22px; display: grid; gap: 14px; font-size: 14px; }
+.pr-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pr-badge { font-size: 12px; font-weight: 600; color: var(--bad); border: 1px solid rgba(248, 113, 113, .5); border-radius: 999px; padding: 2px 10px; }
+.pr-title { color: var(--m-text); font-weight: 600; }
+.pr-changes { color: var(--m-muted); font-size: 13px; }
+.pr-changes code { background: var(--m-panel); color: var(--m-text); padding: 1px 5px; border-radius: 4px; }
+.pr ul { margin: 0; padding-left: 18px; color: var(--m-muted); font-size: 13.5px; display: grid; gap: 4px; }
+.pr ul b { color: var(--m-text); font-weight: 500; }
+.pr-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.pr-table th { font-size: 11px; font-weight: 500; color: var(--m-faint); text-align: right; padding: 0 0 6px 10px; text-transform: uppercase; letter-spacing: .04em; }
+.pr-table th:first-child, .pr-table td:first-child { text-align: left; padding-left: 0; }
+.pr-table td { border-top: 1px solid var(--m-line); padding: 7px 0 7px 10px; text-align: right; color: var(--m-muted); }
+.pr-table td:first-child { color: var(--m-text); font-family: var(--mono); font-size: 12.5px; }
+.pr-table .x { color: var(--bad); font-weight: 600; }
+.pr-table .ok { color: var(--accent); }
+.scroll { overflow-x: auto; }
+
+/* ---------- headline numbers ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.stat { padding: 16px 0; display: grid; gap: 2px; align-content: start; }
+.stat + .stat { padding-left: 16px; border-left: 1px solid var(--line); }
+.stat b { font-size: 24px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--faint); line-height: 1.4; }
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* ---------- rows ---------- */
+.rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.rows > li { border-bottom: 1px solid var(--line); padding: 12px 0; display: grid; gap: 2px; }
+.row-title { font-weight: 500; }
+.row-sub { font-size: 14px; color: var(--muted); }
+.step { grid-template-columns: 52px minmax(0, 1fr); }
+.step-n { font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; padding-top: 1px; }
+
+/* ---------- diagram ---------- */
+.diagram-scroll { overflow-x: auto; padding: 18px 12px; }
+.diagram { display: block; width: 100%; min-width: 560px; height: auto; font-family: var(--sans); }
+.diagram .box { fill: var(--m-panel); stroke: var(--m-line); }
+.diagram .gate { fill: var(--m-panel); stroke: var(--m-faint); stroke-dasharray: 4 3; }
+.diagram .out { fill: var(--media-bg); stroke: var(--accent); stroke-width: 1.4; }
+.diagram .wire { fill: none; stroke: var(--m-faint); stroke-width: 1.2; }
+.diagram .arrow { fill: var(--m-faint); }
+.diagram .t { fill: var(--m-text); font-size: 13px; font-weight: 500; }
+.diagram .s { fill: var(--m-muted); font-size: 11.5px; }
+.diagram .w { fill: var(--m-faint); font-size: 11px; }
+.diagram .lane { fill: var(--m-faint); font-size: 10.5px; font-weight: 500; letter-spacing: .08em; }
+
+/* ---------- tables ---------- */
+.table-scroll { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+table.data th { font-size: 12px; font-weight: 500; color: var(--faint); text-align: right; padding: 0 0 8px 12px; white-space: nowrap; }
+table.data th:first-child, table.data td:first-child { text-align: left; padding-left: 0; }
+table.data td { border-top: 1px solid var(--line); padding: 10px 0 10px 12px; text-align: right; white-space: nowrap; }
+table.data td:first-child { color: var(--text); font-weight: 500; white-space: normal; }
+table.data td.dim { color: var(--faint); }
+table.data td.up { font-weight: 600; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- stack ---------- */
+.panel { background: var(--code-bg); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
+.panel h2 { color: var(--muted); }
+.groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.group { display: grid; gap: 8px; align-content: start; }
+.group h3 { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.tools { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tool { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 1px; }
+.tool b { font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+.tool span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+@media (max-width: 640px) { .groups { grid-template-columns: minmax(0, 1fr); } }
+
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; font-size: 13px; color: var(--faint); border-top: 1px solid var(--line); padding-top: 20px; }
+footer a { color: var(--faint); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="22" height="22">RAG Observability</a>
+    <nav aria-label="Project links">
+      <a href="https://github.com/krushaalkalkani/rag-observability">GitHub</a>
+      <a href="https://ask-my-docs-ivory.vercel.app/">The RAG system</a>
+      <button class="theme-btn" id="theme-toggle" type="button" aria-label="Toggle dark mode">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">Production RAG · Observability</p>
+    <h1 id="title">Trace it. Measure it. <span>Gate it.</span></h1>
+    <p class="lede">Building a RAG system is about 30% of the work. The rest is knowing whether it works, why it fails, and fixing it fast. This adds that layer to a RAG system over SEC 10-K filings: every request traced, quality tracked over time with alerts, and a CI gate that blocks pull requests that make answers worse.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/krushaalkalkani/rag-observability">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+      <a class="btn" href="https://github.com/krushaalkalkani/rag-observability/blob/main/docs/incident-001.md">Incident write-up</a>
+      <a class="btn" href="https://github.com/krushaalkalkani/rag-observability/pull/1">Blocked PR</a>
+    </div>
+  </section>
+
+  <figure class="wide">
+    <div class="media shot">
+      <a href="/img/trace-llm-generation.jpg"><img src="/img/trace-llm-generation.jpg" alt="Langfuse trace of one request: the step tree on the left (retrieval, vector search, keyword search, fusion, re-rank, LLM generation, guardrails) and the exact prompt sent to the LLM on the right, with latency 1.41 s, time to first token 1.03 s, cost $0.000565 and 5k tokens" width="2000" height="1455"></a>
+    </div>
+    <figcaption>Tap any screenshot for full size. One real request in self-hosted Langfuse: every step with its timing, and the exact prompt the LLM received. Scores on top: faithfulness, citation coverage, refused, and the user's thumbs-up.</figcaption>
+  </figure>
+
+  <div class="stats" role="list" aria-label="Headline results">
+    <div class="stat" role="listitem"><b>6.7 min</b><span>to root-cause an injected regression</span></div>
+    <div class="stat" role="listitem"><b>9 steps</b><span>traced on every request</span></div>
+    <div class="stat" role="listitem"><b>95 → 66%</b><span>coverage drop blocked by CI</span></div>
+    <div class="stat" role="listitem"><b>$0.0005</b><span>per request, tracked per call</span></div>
+  </div>
+
+  <section aria-labelledby="h-how">
+    <h2 id="h-how">How it fits together</h2>
+    <figure>
+      <div class="media diagram-scroll">
+        <svg class="diagram" viewBox="0 0 600 372" role="img" aria-labelledby="dg-title">
+          <title id="dg-title">Requests are traced into Langfuse; a monitoring job turns traces into metrics for a dashboard and alerts; pull requests run the eval, are compared with main, get a comment, and fail on regression</title>
+          <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0 0 L8 4 L0 8 z"/></marker></defs>
+          <text class="lane" x="12" y="22">EVERY REQUEST</text>
+          <rect class="box" x="12" y="34" width="130" height="48" rx="8"/>
+          <text class="t" x="77" y="55" text-anchor="middle">RAG pipeline</text>
+          <text class="s" x="77" y="72" text-anchor="middle">9 traced steps</text>
+          <path class="wire" d="M142 58 H178" marker-end="url(#ah)"/>
+          <rect class="box" x="180" y="34" width="130" height="48" rx="8"/>
+          <text class="t" x="245" y="55" text-anchor="middle">Langfuse</text>
+          <text class="s" x="245" y="72" text-anchor="middle">self-hosted traces</text>
+          <path class="wire" d="M310 58 H346" marker-end="url(#ah)"/>
+          <rect class="box" x="348" y="34" width="110" height="48" rx="8"/>
+          <text class="t" x="403" y="55" text-anchor="middle">make metrics</text>
+          <text class="s" x="403" y="72" text-anchor="middle">10% LLM-judged</text>
+          <path class="wire" d="M458 58 H494" marker-end="url(#ah)"/>
+          <rect class="box" x="496" y="34" width="92" height="48" rx="8"/>
+          <text class="t" x="542" y="55" text-anchor="middle">SQLite</text>
+          <text class="s" x="542" y="72" text-anchor="middle">metrics table</text>
+          <path class="wire" d="M542 82 V112 H470 V126" marker-end="url(#ah)"/>
+          <path class="wire" d="M542 112 V126" marker-end="url(#ah)"/>
+          <rect class="out" x="400" y="128" width="104" height="40" rx="20"/>
+          <text class="t" x="452" y="153" text-anchor="middle">Dashboard</text>
+          <rect class="gate" x="512" y="128" width="76" height="40" rx="8"/>
+          <text class="t" x="550" y="153" text-anchor="middle">Alerts</text>
+          <text class="w" x="245" y="118" text-anchor="middle">prompt_version · config_hash · git_sha</text>
+          <text class="w" x="245" y="133" text-anchor="middle">on every trace</text>
+
+          <line x1="12" y1="200" x2="588" y2="200" stroke="#2c2c2c"/>
+          <text class="lane" x="12" y="228">EVERY PULL REQUEST</text>
+          <rect class="box" x="12" y="240" width="130" height="48" rx="8"/>
+          <text class="t" x="77" y="261" text-anchor="middle">Golden-set eval</text>
+          <text class="s" x="77" y="278" text-anchor="middle">39 questions, RAGAS</text>
+          <path class="wire" d="M142 264 H178" marker-end="url(#ah)"/>
+          <rect class="box" x="180" y="240" width="130" height="48" rx="8"/>
+          <text class="t" x="245" y="261" text-anchor="middle">Compare</text>
+          <text class="s" x="245" y="278" text-anchor="middle">vs main's baseline</text>
+          <path class="wire" d="M310 264 H346" marker-end="url(#ah)"/>
+          <rect class="out" x="348" y="240" width="110" height="48" rx="24"/>
+          <text class="t" x="403" y="268" text-anchor="middle">PR comment</text>
+          <path class="wire" d="M458 264 H494" marker-end="url(#ah)"/>
+          <rect class="gate" x="496" y="240" width="92" height="48" rx="8"/>
+          <text class="t" x="542" y="261" text-anchor="middle">Pass / fail</text>
+          <text class="s" x="542" y="278" text-anchor="middle">calibrated Δ</text>
+          <rect class="box" x="180" y="314" width="130" height="40" rx="8"/>
+          <text class="t" x="245" y="338" text-anchor="middle">push to main</text>
+          <path class="wire" d="M245 314 V290" marker-end="url(#ah)"/>
+          <text class="w" x="252" y="304">new baseline</text>
+        </svg>
+      </div>
+      <figcaption>Two loops: one watches production traffic, the other stops bad changes before they ship.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="h-trace">
+    <h2 id="h-trace">1 · Tracing every step</h2>
+    <p>Each question becomes one trace; each pipeline stage is a span that records what a debugger needs. Open any request and you see exactly what was retrieved, how the re-ranker reordered it, what was sent to the LLM, and what came back.</p>
+    <figure>
+      <div class="media tree" aria-label="The spans recorded for every request">
+<b>rag-request</b>            <i>question → answer, latency, cost, scores</i>
+ ├─ <b>retrieval</b>          <i>final top-5 chunks: ids, scores, preview</i>
+ │   ├─ <b>vector-search</b>  <i>top-20 by meaning</i>
+ │   ├─ <b>bm25-search</b>    <i>top-20 by exact words</i>
+ │   ├─ <b>rrf-fusion</b>     <i>merged order; found by both?</i>
+ │   └─ <b>rerank</b>         <span class="acc">old rank → new rank, kept?</span>
+ ├─ <b>retrieval-gate</b>     <i>refuse before the LLM?</i>
+ ├─ <b>llm-generation</b>     <span class="acc">prompt, tokens, $, time to first token</span>
+ └─ <b>citation-check</b>     <i>dropped sentences and why</i></div>
+      <figcaption>Every trace also carries <code>prompt_version</code>, <code>config_hash</code>, <code>git_sha</code> and an anonymous session id, so any answer traces back to the exact code, config and prompt.</figcaption>
+    </figure>
+    <figure class="wide">
+      <div class="media shot"><a href="/img/trace-timeline.jpg"><img src="/img/trace-timeline.jpg" alt="Timeline view of a trace: retrieval 1.27 s of which re-ranking 1.02 s, then the LLM 1.41 s; the re-rank step shows its input query, candidates and top_n 5" width="2000" height="671" loading="lazy" decoding="async"></a></div>
+      <figcaption>Timeline of the same request: re-ranking (1.02 s) and the LLM (1.41 s) are where the time goes.</figcaption>
+    </figure>
+    <p class="note">The Anthropic SDK emits its own trace span, and Langfuse's default price for it ignored the <em>thinking</em> tokens Haiku bills as output: 238 output tokens instead of 816 on one request. Cost is now computed from a pricing table in config, and only the pipeline's own spans are exported.</p>
+  </section>
+
+  <section aria-labelledby="h-metrics">
+    <h2 id="h-metrics">2 · Quality over time</h2>
+    <p>A monitoring job pulls finished traces into a metrics table, grades a stable 10% sample for faithfulness with an LLM judge (no ground truth needed), and checks alert rules. Thresholds were set from a 90-request baseline, not guessed.</p>
+    <figure class="wide">
+      <div class="media shot"><a href="/img/dashboard-top.jpg"><img src="/img/dashboard-top.jpg" alt="Monitoring dashboard: a firing error-rate alert banner, eight headline metrics, and latency over time end to end and per step" width="2000" height="970" loading="lazy" decoding="async"></a></div>
+      <figcaption>The alert is real: an unplanned network outage failed 22 of 30 requests, and <code>error_rate_high</code> fired on its first check.</figcaption>
+    </figure>
+    <div class="table-scroll">
+      <table class="data">
+        <caption class="sr-only">Baseline metrics and alert thresholds</caption>
+        <thead><tr><th scope="col">Metric</th><th scope="col">Baseline</th><th scope="col">Alert when</th></tr></thead>
+        <tbody>
+          <tr><td>Latency p50 / p95</td><td>2.5 / 5.8 s</td><td>p95 &gt; 8 s</td></tr>
+          <tr><td>Citation coverage</td><td>95%</td><td>&lt; 90%</td></tr>
+          <tr><td>Refusal rate</td><td>30%</td><td>&gt; 45%</td></tr>
+          <tr><td>Error rate</td><td>0%</td><td>&gt; 2%</td></tr>
+          <tr><td>Cost per request</td><td>$0.00053</td><td>&gt; $0.001</td></tr>
+          <tr><td>Faithfulness, 10% sample</td><td>1.00</td><td>&lt; 0.85, ≥ 5 graded</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The suggested "p95 &gt; 3 s" alert would have fired constantly (the LLM step alone has a 4.2 s p95), and an always-on alert gets ignored. Alerts notify only when they change state, with clues: the metric split by prompt version, config and commit.</p>
+  </section>
+
+  <section aria-labelledby="h-incident">
+    <h2 id="h-incident">3 · Incident 001: the regression no alert caught</h2>
+    <p>The drill: ship a plausible change, then find it using only the dashboard and traces. The change was <code>retrieval.top_k: 5 → 2</code>, "to cut LLM input tokens". It did. Answers got worse, and <strong>every online quality metric improved</strong>.</p>
+    <div class="table-scroll">
+      <table class="data">
+        <caption class="sr-only">Same 30 questions before and during the incident</caption>
+        <thead><tr><th scope="col">Same 30 questions</th><th scope="col">Healthy</th><th scope="col">Bad change</th></tr></thead>
+        <tbody>
+          <tr><td>Citation coverage</td><td>96.5%</td><td class="up">99.5%</td></tr>
+          <tr><td>Faithfulness (sampled)</td><td>0.92</td><td class="up">1.00</td></tr>
+          <tr><td>Tokens per request</td><td>4,273</td><td class="up">1,910</td></tr>
+          <tr><td>Right source retrieved (golden questions)</td><td>16 / 17</td><td class="up">13 / 17</td></tr>
+          <tr><td>Answerable question refused</td><td>0</td><td class="up">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Coverage and faithfulness ask "is what the model said supported?" With fewer chunks it said less, all of it supported. Neither metric can see what was left out.</p>
+    <figure class="wide">
+      <div class="media shot"><a href="/img/dashboard-compare-by-config.jpg"><img src="/img/dashboard-compare-by-config.jpg" alt="Dashboard comparing configs: tokens per request around 4,300 for the healthy config and 1,900 for the bad one at 18:32" width="2000" height="674" loading="lazy" decoding="async"></a></div>
+      <figcaption>What gave it away: tokens per request halved exactly when a new config first appeared. A step that sharp is a deploy, not users.</figcaption>
+    </figure>
+    <figure>
+      <div class="media mock" aria-label="Re-rank step of two traces of the same question">
+        <span class="mock-label">Same question, two traces</span>
+        <p class="mock-q">Which company is Tesla working with to make AI chips in the United States?</p>
+        <div class="scroll">
+          <table class="ev">
+            <thead><tr><th>Re-rank</th><th>Chunk</th><th>Score</th><th>top_k 5</th><th>top_k 2</th></tr></thead>
+            <tbody>
+              <tr><td>#1</td><td>TSLA-2025-00195</td><td>0.843</td><td class="kept">kept</td><td class="kept">kept</td></tr>
+              <tr><td>#2</td><td>TSLA-2025-00005</td><td>0.540</td><td class="kept">kept</td><td class="kept">kept</td></tr>
+              <tr class="hit"><td>#3</td><td>TSLA-2025-00009</td><td>0.528</td><td class="kept">kept</td><td class="cut">cut</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="answers">
+          <div class="ans"><span class="who">Healthy</span><span>Tesla announced a new collaboration with <mark>Samsung</mark> to manufacture advanced semiconductors for AI… [TSLA-2025-00009]</span></div>
+          <div class="ans bad"><span class="who">Bad change</span><span>I can't answer that from the documents.</span></div>
+        </div>
+      </div>
+      <figcaption>The re-ranker behaved identically. The evidence ranked 3rd, 0.011 below 2nd, and <code>top_k: 2</code> cut it before the LLM ever saw it.</figcaption>
+    </figure>
+    <ol class="rows">
+      <li class="step"><span class="step-n">18:31</span><div><div class="row-title">Bad change deployed</div><p class="row-sub">Commit <code>6fa88a5</code>, config <code>88336cc9e2fd</code>. No errors, cost halved.</p></div></li>
+      <li class="step"><span class="step-n">18:37</span><div><div class="row-title">Monitoring runs: zero alerts</div><p class="row-sub">The detection gap: online metrics measure support, not completeness.</p></div></li>
+      <li class="step"><span class="step-n">18:40</span><div><div class="row-title">Root cause confirmed</div><p class="row-sub">Dashboard → per-config split → two traces of the same question. 6.7 minutes after the monitoring run.</p></div></li>
+      <li class="step"><span class="step-n">18:41</span><div><div class="row-title">Rolled back</div><p class="row-sub"><code>config_hash</code> returned to the healthy value, proving the config is identical, not just "reverted". Replay: 16/17 again.</p></div></li>
+    </ol>
+    <p class="note">The CI gate below is the fix: it measures retrieval against known answers on every PR, where this change drops below its threshold. <a href="https://github.com/krushaalkalkani/rag-observability/blob/main/docs/incident-001.md">Full postmortem</a>.</p>
+  </section>
+
+  <section aria-labelledby="h-gate">
+    <h2 id="h-gate">4 · Gating every pull request</h2>
+    <p>Each PR runs the golden-set eval in GitHub Actions and is compared with the latest baseline from <code>main</code>. Comparing to <code>main</code> catches what fixed floors miss: 0.99 → 0.88 clears an 0.85 floor but is an 11-point regression.</p>
+    <figure>
+      <div class="media pr" aria-label="The eval gate's comment on a pull request">
+        <div class="pr-head"><span class="pr-badge">✕ Eval gate failed</span><span class="pr-title">3 problems vs main</span></div>
+        <p class="pr-changes">This PR changes: prompt <code>answer_v2</code> → <code>answer_v3_readable</code>. Nothing else.</p>
+        <ul>
+          <li><b>citation_coverage</b> dropped from 94.6% to 66.0% (−28.6 pts; 3 allowed)</li>
+          <li><b>refusal_accuracy</b> dropped from 100% to 82.1% (−17.9 pts; 5 allowed)</li>
+          <li><b>faithfulness</b> dropped from 99.7% to 95.4% (−4.3 pts; 3 allowed)</li>
+        </ul>
+        <div class="scroll">
+          <table class="pr-table">
+            <thead><tr><th>Metric</th><th>main</th><th>this PR</th><th>Δ</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>hit_rate@5</td><td>92.9%</td><td>92.9%</td><td>0.0</td><td class="ok">✓</td></tr>
+              <tr><td>faithfulness</td><td>99.7%</td><td>95.4%</td><td>−4.3</td><td class="x">✕</td></tr>
+              <tr><td>citation_coverage</td><td>94.6%</td><td>66.0%</td><td>−28.6</td><td class="x">✕</td></tr>
+              <tr><td>refusal_accuracy</td><td>100%</td><td>82.1%</td><td>−17.9</td><td class="x">✕</td></tr>
+              <tr><td>p95 latency</td><td>13.9 s</td><td>14.7 s</td><td>+5%</td><td class="ok">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="pr-changes">Questions that got worse: "What is Tesla's Cybercab?" now refused (answerable question) · citation coverage 100% → 33% · …</p>
+      </div>
+      <figcaption>The real comment CI posted on <a href="https://github.com/krushaalkalkani/rag-observability/pull/1">PR #1</a>, abridged: a "more readable" prompt that cites once per paragraph instead of per sentence. The guardrail can't verify most claims any more, so answerable questions get refused. (p95 is high because CI re-ranks on a 2-CPU runner; it's only compared against the same kind of machine.)</figcaption>
+    </figure>
+    <div class="table-scroll">
+      <table class="data">
+        <caption class="sr-only">Gate tolerances and how they were calibrated</caption>
+        <thead><tr><th scope="col">Gate</th><th scope="col">Fails when</th><th scope="col">Noise between identical runs</th></tr></thead>
+        <tbody>
+          <tr><td>Retrieval hit rate</td><td>−2 pts</td><td>0 (deterministic)</td></tr>
+          <tr><td>Faithfulness, citation coverage</td><td>−3 pts</td><td>0.3–1.2 pts</td></tr>
+          <tr><td>Refusal accuracy</td><td>−5 pts</td><td>1 of 39 may flip</td></tr>
+          <tr><td>p95 latency, same machine</td><td>+50%</td><td>+29%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Every eval report records <code>prompt_version</code>, a hash of the prompt file, <code>config_hash</code> and <code>git_sha</code>; the gate warns when a prompt is edited without bumping its version.</p>
+  </section>
+
+  <section aria-labelledby="h-lessons">
+    <h2 id="h-lessons">What went wrong</h2>
+    <ul class="rows">
+      <li><div class="row-title">The regression made the dashboard look better</div><p class="row-sub">Groundedness metrics can't see missing information. Detection came from a cost step change; the real catch is retrieval measured against known answers in CI.</p></li>
+      <li><div class="row-title">The dashboard could only compare prompt versions</div><p class="row-sub">Incident 001 was a config change, invisible there. Fixed mid-incident: compare by prompt, config or commit.</p></li>
+      <li><div class="row-title">An alert blamed an innocent commit</div><p class="row-sub">During the outage the error alert's clue pointed at the newest commit, a dashboard-only change that happened to be running. The error messages said "network". Clues show correlation, not cause.</p></li>
+      <li><div class="row-title">One NaN poisoned an average</div><p class="row-sub">The RAGAS judge returned NaN for two answers, turning a mean into NaN. Failed grades now count as judge errors, and the PR comment says how many.</p></li>
+    </ul>
+  </section>
+
+  <section class="panel" aria-labelledby="h-stack">
+    <h2 id="h-stack">Stack</h2>
+    <div class="groups">
+      <div class="group"><h3>Tracing</h3><ul class="tools">
+        <li class="tool"><b>Langfuse v4</b><span>Self-hosted in Docker</span></li>
+        <li class="tool"><b>OpenTelemetry</b><span>Spans under the hood</span></li>
+        <li class="tool"><b>ClickHouse + Postgres</b><span>Langfuse storage</span></li>
+      </ul></div>
+      <div class="group"><h3>Metrics</h3><ul class="tools">
+        <li class="tool"><b>SQLite + pandas</b><span>Metrics table, p50/p95</span></li>
+        <li class="tool"><b>RAGAS + Claude Opus 5.5</b><span>Online faithfulness judge</span></li>
+        <li class="tool"><b>Streamlit + Altair</b><span>Dashboard</span></li>
+      </ul></div>
+      <div class="group"><h3>Gating</h3><ul class="tools">
+        <li class="tool"><b>GitHub Actions</b><span>Eval on every PR</span></li>
+        <li class="tool"><b>Golden set</b><span>39 questions in CI, 63 total</span></li>
+        <li class="tool"><b>Claude Haiku 5.5</b><span>Answers, versioned prompts</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>RAG Observability · built by Krushal Kalkani</span>
+    <span><a href="https://github.com/krushaalkalkani/rag-observability">Source</a> · <a href="https://ask-my-docs-ivory.vercel.app/">The RAG system</a></span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var current = root.getAttribute("data-theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

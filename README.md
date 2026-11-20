@@ -1,152 +1,169 @@
-# Ask My Docs — production-grade RAG over SEC 10-K filings
+# RAG Observability — trace it, measure it, gate it
 
-> **Project 3 — Observability** extends this RAG system (forked from Project 1).
-> Phase 1 done: every request is traced step by step in self-hosted Langfuse —
-> retrieval, re-ranking, the exact LLM prompt, tokens, cost, time-to-first-token and
-> guardrail decisions. Setup and how to read a trace: [docs/observability.md](docs/observability.md).
-> `make langfuse-up`, then `make ask Q="..."` prints a link to the trace.
-> Phase 2 done: p50/p95 latency, cost, citation coverage, refusal/error rate and sampled
-> online faithfulness over time (`make metrics`, `make dashboard`), with calibrated alerts.
-> Incident drill: [docs/incident-001.md](docs/incident-001.md) — a "cost optimization" that
-> silently cut answer evidence, root-caused in under 7 minutes.
-> Phase 3 done: every PR runs the golden-set eval, is compared with `main`, gets a comment
-> table (metric, main, PR, Δ) and fails on regressions: [example](docs/example-pr-comment.md) —
-> a prompt-only "readability" change that dropped citation coverage 96% → 71%.
+Monitoring and observability for a production RAG system (Q&A over ten companies' SEC
+10-K filings, from [production-rag](https://github.com/krushaalkalkani/production-rag)):
+every request traced step by step in self-hosted Langfuse, quality and cost tracked over
+time with calibrated alerts, a real incident root-caused from the dashboard, and a CI gate
+that fails a pull request when quality drops against `main`.
 
-Ask a question about 10 companies' latest 10-K annual reports and get an answer with
-citations to the exact source passage, or a refusal when the filings don't contain the answer.
-Every pull request is gated by an automated evaluation that **fails the build if answer quality drops**.
+**Live overview:** https://rag-observability.vercel.app ·
+**Incident write-up:** [docs/incident-001.md](docs/incident-001.md) ·
+**Failing PR:** [#1](https://github.com/krushaalkalkani/rag-observability/pull/1)
 
-Companies: AAPL, MSFT, NVDA, TSLA, AMZN, GOOGL, META, JPM, NFLX, AMD (2,439 chunks).
+> Building the system is ~30% of the work. The rest is knowing whether it works, why it
+> fails, and fixing it fast. This project is that 70%.
 
-![Demo: a cited answer, the source passage behind it, and a refused out-of-scope question](docs/demo.gif)
+![A full trace in Langfuse: every step of one request, with the exact prompt sent to the LLM, tokens, cost and time-to-first-token](docs/images/trace-llm-generation.jpg)
 
-*Ask a question → cited answer → open source [1] to see the passage it came from → an out-of-scope
-question is refused. Recorded from the real UI; the yellow highlight on the cited line was added
-for the recording.* Project site: [ask-my-docs-ivory.vercel.app](https://ask-my-docs-ivory.vercel.app)
-(source in [`site/`](site/), deployed with Vercel).
+## Headline results
 
-## Quick start
+| | |
+|---|---|
+| **Root cause in 6.7 min** | an injected config regression, found from the dashboard and confirmed from two traces ([incident 001](docs/incident-001.md)) |
+| **9 steps per request** | traced: vector + keyword search, fusion, re-ranking (before → after), relevance gate, LLM call, citation check |
+| **Prompt-only PR blocked** | citation coverage 95% → 66% vs `main`; CI failed and explained why ([PR #1](https://github.com/krushaalkalkani/rag-observability/pull/1)) |
+| **Thresholds from data** | alert and CI tolerances set from measured noise, not guessed — e.g. p95 moved +29% between two identical runs |
+
+## Phase 1 — Tracing every step
+
+Every request is one trace in **self-hosted Langfuse** (Docker), and each pipeline stage is
+a span with what a debugger needs:
+
+```
+rag-request              question → answer, latency, cost, scores
+ ├─ retrieval            final top-5 chunks (ids, scores, preview)
+ │   ├─ vector-search    top-20 by meaning
+ │   ├─ bm25-search      top-20 by exact words (+ the tokens searched)
+ │   ├─ rrf-fusion       merged order; which chunks both found
+ │   └─ rerank           every candidate: old rank → new rank, score, kept?
+ ├─ retrieval-gate       refuse before the LLM if nothing is relevant?
+ ├─ llm-generation       exact prompt, output, tokens, $ cost, time-to-first-token
+ └─ citation-check       which sentences were dropped and why, coverage
+```
+
+Every trace carries `prompt_version`, `config_hash` (fingerprint of the behaviour-relevant
+config), `git_sha` and an anonymous session id; scores `refused`, `citation_coverage` and
+`user_feedback` (👍/👎 in the UI) are attached to it.
+
+![Timeline view: per-step latency for one request](docs/images/trace-timeline.jpg)
+
+Two details that mattered:
+- **Cost is computed by us.** The Anthropic SDK's own trace span priced only visible output
+  tokens and missed Haiku's billed *thinking* tokens (238 vs 816 output tokens on one
+  request) and double-counted the call. Only our spans are exported.
+- **Streaming** so time-to-first-token — the latency a user actually feels — is measured.
+
+## Phase 2 — Quality metrics over time
+
+`make metrics` pulls finished traces from Langfuse into SQLite, grades a stable 10% sample
+for **faithfulness** with an LLM judge (no ground truth needed), rolls everything up per
+time bucket, and checks alert rules. `make dashboard` shows it.
+
+![Monitoring dashboard: alert banner, headline metrics, latency per step over time](docs/images/dashboard-top.jpg)
+
+*The alert is real: a network outage on Nov 18 failed 22 of 30 requests and
+`error_rate_high` fired on its first check.*
+
+| Metric | Baseline (90 requests) | Alert |
+|---|---|---|
+| p50 / p95 latency | 2.5 s / 5.8 s | p95 > 8 s |
+| citation coverage | 95% | < 90% |
+| refusal rate (traffic with ~15% unanswerable questions) | 30% | > 45% |
+| error rate | 0% | > 2% |
+| cost / request | $0.00053 | > $0.001 |
+| sampled faithfulness | 1.00 | < 0.85, with ≥ 5 graded |
+
+Alerts fire only when they change state, and each message carries clues: the metric split
+by prompt version, config and commit, plus any version first seen in the window.
+
+### Incident 001 — a "cost optimization" that made answers worse
+
+A commit changed `retrieval.top_k: 5 → 2` "to cut LLM tokens". **No alert fired** — every
+online quality metric *improved* (coverage 96.5% → 99.5%) because the model said less, all of
+it grounded. The dashboard showed the signature: tokens per request halved at a new config.
+Replaying the same 30 questions proved the damage: the correct source chunk was retrieved for
+13/17 golden questions instead of 16/17, and one answerable question was refused because its
+evidence was ranked #3 — 0.011 below #2 — and cut.
+
+![Compare by config: tokens per request 4,300 → 1,900 at the bad config](docs/images/dashboard-compare-by-config.jpg)
+
+Full timeline, trace evidence and action items: **[docs/incident-001.md](docs/incident-001.md)**.
+
+## Phase 3 — Regression gating in CI
+
+Every pull request runs the golden-set eval in GitHub Actions and is compared with the
+latest baseline from `main`. The PR gets a comment — what changed, a metric table (main,
+PR, Δ, allowed), why it failed, and the questions that got worse — and the build fails if:
+
+| Check | Rule | Calibrated from two identical runs |
+|---|---|---|
+| hit_rate@5 | drop > 2 pts | retrieval is deterministic: 0 change, so losing one question fails |
+| faithfulness / citation coverage | drop > 3 pts | judge noise 0.3–1.2 pts |
+| refusal accuracy | drop > 5 pts | one of 39 questions may flip |
+| p95 latency | > +50%, same kind of machine only | moved +29% with no change |
+| absolute floors | e.g. faithfulness ≥ 85% | kept from production-rag |
+
+**Demo:** [PR #1](https://github.com/krushaalkalkani/rag-observability/pull/1) changes only
+the prompt — a "more readable" version that cites once per paragraph instead of per
+sentence. The guardrail can no longer verify most claims. On GitHub's runners: citation
+coverage 94.6% → 66.0%, refusal accuracy 100% → 82.1%, faithfulness 99.7% → 95.4% — the
+gate failed and posted that explanation on the PR (an earlier local run:
+[docs/example-pr-comment.md](docs/example-pr-comment.md)). Each eval report records `prompt_version`,
+`prompt_hash`, `config_hash` and `git_sha`, and the gate warns when a prompt file is edited
+without bumping its version.
+
+## Run it
+
+Needs Docker, [uv](https://docs.astral.sh/uv/), and an `ANTHROPIC_API_KEY`.
 
 ```bash
-make setup                         # install Python deps with uv
-export ANTHROPIC_API_KEY=...       # answering model + eval judge
-export SEC_USER_AGENT="Your Name your@email.com"   # SEC asks bots to identify themselves
-make ingest                        # download -> parse -> chunk -> embed -> Chroma (~1-2 min)
-make serve                         # API on http://localhost:8000  (docs: /docs)
-make ui                            # UI on http://localhost:8501  (second terminal)
+uv sync                      # dependencies
+make ingest                  # download 10-Ks, build the index (one-off)
+make langfuse-up             # self-hosted Langfuse on http://localhost:3000 (login in .env)
+make ask Q="What was JPMorgan's CET1 capital ratio?"    # prints a link to its trace
+make traffic N=50 RATE=6     # simulated users (~$0.0006/request)
+make metrics                 # Langfuse → metrics table, 10% judged, alerts
+make dashboard               # http://localhost:8502
+make ci-local                # what CI runs on a PR (~$2)
+make test                    # 36 unit tests
 ```
 
-| Command | What it does |
+Details: [docs/observability.md](docs/observability.md) (setup, how to read a trace, every
+metric and alert, the drill runbook, the gate).
+
+## Repo map
+
+| Path | What |
 |---|---|
-| `make ask Q="..."` | answer in the terminal (`--debug` shows scores + per-sentence checks) |
-| `make test` | 14 offline unit tests (parsing, chunking, RRF, guardrails, gate logic) |
-| `make golden` | rebuild `eval/golden_set.jsonl` from `eval/golden_seed.yaml` |
-| `make ablation` | vector vs BM25 vs hybrid vs hybrid+rerank → `eval/reports/` |
-| `make eval` | full RAGAS evaluation, 63 questions (~$3.80 judge cost) |
-| `make ci-local` | exactly what GitHub Actions runs: fixture index + gated eval (~$2) |
+| `src/rag/tracing.py` | Langfuse wrapper: spans, metadata, cost, feedback (no-op without keys) |
+| `src/rag/monitoring/` | collect → online eval → aggregate → alerts (`make metrics`) |
+| `app/dashboard.py` | Streamlit monitoring dashboard |
+| `eval/compare.py` | the PR regression gate and its comment |
+| `.github/workflows/eval.yml` | CI: baseline on `main`, compare + comment on PRs |
+| `docker-compose.yml` | self-hosted Langfuse (web, worker, Postgres, ClickHouse, Redis, MinIO) |
+| `docs/` | observability guide, incident 001, example PR comment |
 
-## Architecture
+## The RAG system underneath
 
-```
-Ingestion:  SEC EDGAR ─► sec.py ─► parse.py (pages + Item sections) ─► chunking.py (500 tok, 100 overlap)
-                     ─► index.py (bge-small embeddings → Chroma)   [BM25 is built from Chroma at startup]
-
-Query:      question ─┬► BM25 top-20 ───┐
-                      └► vector top-20 ─┴► RRF merge ─► cross-encoder re-rank (bge-reranker-base) ─► top 5
-                                                                   │
-                     best score < 0.05 → refuse (no LLM call) ◄────┤
-                                                                   ▼
-                     Claude Haiku 5.5 + versioned prompt (configs/prompts/answer_v2.yaml)
-                                                                   ▼
-                     guardrails.py: every sentence needs a retrieved citation whose text contains
-                     its numbers and most of its words; unsupported sentences removed, too few left → refuse
-                                                                   ▼
-                     {answer, citations[], refused, prompt_version, latency_ms} → logs/answers.jsonl
-
-CI (every PR):  fixture corpus (3 filings) ─► build index ─► eval/run_eval.py --gate
-                ─► fail if faithfulness / hit rate@5 / refusal accuracy / citation coverage < thresholds
-```
-
-## Results
-
-Golden set: **63 hand-verified questions** — 52 answerable (each with an exact evidence quote
-from the filing) + 11 that must be refused (future years, companies not in the corpus,
-off-topic, investment advice). Judge: Claude Opus 5.5 via RAGAS.
-
-**Retrieval ablation** (52 answerable questions, no LLM involved):
-
-| Setup | Hit rate@5 | MRR@5 | p50 retrieval latency |
-|---|---|---|---|
-| Vector only | 75% | 0.60 | 8 ms |
-| BM25 only | 62% | 0.48 | 1 ms |
-| Hybrid (BM25 + vector, RRF) | 81% | 0.64 | 11 ms |
-| Hybrid + re-rank | **89%** | **0.71** | 756 ms |
-
-**Full system** (hybrid + re-rank + citation enforcement, prompt `answer_v2`), all 63 questions:
-
-| Hit rate@5 | Context recall | Faithfulness | Answer correctness | Citation coverage | Refusal accuracy | p50 / p95 latency |
-|---|---|---|---|---|---|---|
-| 89% | 93% | **98%** | 83% | 99% | 95% | 1.7 s / 2.8 s |
-
-- All 11 must-refuse questions were refused. The 3 refusal errors are all *false* refusals of
-  answerable questions whose source chunk retrieval missed; the model then correctly said it
-  couldn't answer. Retrieval is now the bottleneck, not generation.
-- Answer correctness counts a wrongly refused answerable question as 0.
-- Reports: `eval/reports/eval_full_v2.md` (per-question), `eval/reports/ablation_*.md`.
-- Faithfulness and correctness were only measured for the final setup. To fill the other rows:
-  `uv run python eval/run_eval.py --mode vector --no-guardrails` (and `--mode hybrid`).
-
-**CI gate demo** (3-company fixture subset, 39 questions):
-
-| Prompt | Faithfulness | Hit rate@5 | Refusal accuracy | Citation coverage | Gate |
-|---|---|---|---|---|---|
-| `answer_v2` (normal) | 99% | 93% | 100% | 95% | ✅ pass |
-| `answer_broken_demo` (no grounding/citation/refusal rules) | — | 93% | 28% | — | ❌ fail |
-
-With the broken prompt the model answers without citations. The guardrails then refuse every
-answer, so refusal accuracy collapses and the gate fails. Hit rate is unchanged, which shows the
-metrics isolate *which* component regressed.
-
-## How the CI gate works
-`.github/workflows/eval.yml` runs on every pull request:
-1. unit tests;
-2. builds a fresh Chroma index from `data/fixtures/` (3 parsed filings, committed — no SEC download in CI);
-3. runs `eval/run_eval.py --tickers AAPL TSLA NVDA --gate`, which exits with an error if any
-   metric in `configs/config.yaml → eval.thresholds` is below its threshold;
-4. posts the Markdown report to the job summary and uploads it as an artifact.
-
-Setup: add `ANTHROPIC_API_KEY` as a repository secret. Without it the job fails on purpose,
-because a skipped gate is no gate. Try it: open a PR that sets
-`prompt.version: answer_broken_demo`, and CI goes red.
-
-## What went wrong & how I fixed it
-- **Section labels:** Microsoft repeats "Item 1" as a page header on every page, so "take the last
-  'Item 1' line" picked a page header. Fix: prefer the first line that has a title and is not a
-  table-of-contents row (TOC rows end in a page number or range like "9-31").
-- **Golden label too narrow:** JPMorgan states its CET1 ratio in three places; the re-ranker found
-  the other two and got marked wrong. Fix: `evidence` can list several quotes. Labels are derived
-  from quotes, never typed by hand, so they survive re-chunking.
-- **Short cited sentences ignored** by the guardrail ("Cupertino, California [id]"), making correct
-  short answers refusable. Fix: anything with a citation counts as a claim. Caught by a unit test.
-- **RAGAS `FactualCorrectness` scored 0 even for perfect answers** in this setup; switched answer
-  correctness to RAGAS `AnswerAccuracy`, which behaved correctly on hand-checked examples.
-- **Judge vs. model:** Opus 5.5 rejects forced tool calls, so RAGAS runs the judge in JSON mode.
-  The judge is a stronger model than the answerer, so the system isn't grading its own output.
-
-## Known limits
-- Retrieval misses remain (~11%), mostly vocabulary mismatch ("self-driving" vs "fully autonomous").
-- JPMorgan's 10-K attaches its annual report as an exhibit, so most JPM chunks are labelled Item 15;
-  Netflix's financial statements follow Item 16 and are labelled that way.
-- Page numbers are physical pages in the HTML, not printed page numbers.
-- The guardrail's support check is lexical (words + numbers). Semantic faithfulness is measured
-  offline by the RAGAS judge, not enforced at request time.
-- The golden set was built by me (the developer) from the filings; a second reviewer would make it stronger.
+Hybrid retrieval (BM25 + bge-small vectors, Reciprocal Rank Fusion), a cross-encoder
+re-ranker, Claude Haiku 5.5 with versioned prompts, and a guardrail that deletes any
+sentence its cited chunk doesn't support — over 10 companies' 10-Ks (2,439 chunks), with a
+63-question golden set graded by RAGAS and Claude Opus 5.5. Built in
+[production-rag](https://github.com/krushaalkalkani/production-rag); this repo is a fork
+with the observability layer added.
 
 ## Resume bullets
-- Built a production RAG system over SEC 10-K filings with hybrid BM25 + vector retrieval and
-  cross-encoder re-ranking, improving retrieval hit rate@5 from **75% to 89%** and reaching
-  **98% faithfulness** (RAGAS) on a 63-question hand-verified golden set.
-- Added citation enforcement and refusal logic (refused **11/11** out-of-scope questions) and gated
-  every pull request with an automated RAGAS evaluation in GitHub Actions that fails the build on
-  regressions, demonstrated by a deliberately broken prompt failing CI.
+
+- Added end-to-end observability to a RAG system with self-hosted Langfuse tracing of every
+  pipeline step, tracking p50/p95 latency, cost per request, citation coverage and sampled
+  online faithfulness with calibrated alerts; diagnosed an injected quality regression to
+  root cause in **under 7 minutes**.
+- Built CI regression gating that compares every PR's golden-set eval with `main` and
+  blocks merges when faithfulness, retrieval or citation metrics drop beyond noise-calibrated
+  tolerances, posting a metric-diff comment on the PR.
+
+## Interview questions this covers
+
+Why p95 instead of average latency? · What do you log for an LLM request and why? · How do
+you monitor quality with no ground truth in production? · Walk me through debugging a
+quality drop. · How do you treat prompt changes safely?
